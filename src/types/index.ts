@@ -1,0 +1,99 @@
+// User types
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  avatar?: string;
+}
+
+// Auth types
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials extends LoginCredentials {
+  name: string;
+}
+
+// Currency types
+export interface Currency {
+  code: string;
+  name: string;
+  flag: string;
+  symbol: string;
+}
+
+// Transfer types
+export interface Transfer {
+  id: string;
+  fromCurrency: string;
+  toCurrency: string;
+  sendAmount: number;
+  receiveAmount: number;
+  exchangeRate: number;
+  fee: number;
+  totalAmount: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  recipientId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TransferRequest {
+  fromCurrency: string;
+  toCurrency: string;
+  sendAmount: number;
+  recipientId: string;
+}
+
+export interface ExchangeRate {
+  from: string;
+  to: string;
+  rate: number;
+  fee: number;
+  timestamp: string;
+}
+
+export interface Recipient {
+  id: string;
+  name: string;
+  email: string;
+  country: string;
+  bankAccount?: string;
+  mobileWallet?: string;
+}
+
+// Transfer state
+export interface TransferState {
+  transfers: Transfer[];
+  currentTransfer: Transfer | null;
+  exchangeRates: Record<string, ExchangeRate>;
+  recipients: Recipient[];
+  loading: boolean;
+  error: string | null;
+}
+
+// API Response types
+export interface ApiResponse<T> {
+  data: T;
+  message: string;
+  success: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
