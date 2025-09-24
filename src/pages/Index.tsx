@@ -4,7 +4,7 @@ import { TransferSteps } from "@/components/TransferSteps";
 
 const Index = () => {
   return (
-    <div className="space-y-16 pb-16">
+    <div className="space-y-8 pb-8">
       <Hero />
       <CurrencyConverter />
       <TransferSteps />
