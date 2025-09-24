@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Routes, Route } from "react-router-dom";
+import AppLayout from "./components/layout/AppLayout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -10,9 +11,11 @@ const App = () => (
     <Toaster />
     <Sonner />
     <Routes>
-      <Route path="/" element={<Index />} />
-      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<NotFound />} />
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Index />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Route>
     </Routes>
   </TooltipProvider>
 );
