@@ -81,7 +81,7 @@ export const handlers = [
 
   http.post(resolveEndpoint(API_ENDPOINTS.AUTH.REGISTER), async ({ request }) => {
     const body = await request.json() as { email: string; password: string; name: string };
-    
+
     return HttpResponse.json({
       success: true,
       data: {
@@ -89,6 +89,14 @@ export const handlers = [
         token: 'mock-jwt-token',
       },
       message: 'Registration successful',
+    });
+  }),
+
+  http.post(resolveEndpoint(API_ENDPOINTS.AUTH.LOGOUT), () => {
+    return HttpResponse.json({
+      success: true,
+      data: null,
+      message: 'Logout successful',
     });
   }),
 
