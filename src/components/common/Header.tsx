@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Sun, Moon, LogIn, UserPlus, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
@@ -8,6 +8,11 @@ import { APP_NAME } from "@/constants";
 export const Header = () => {
   const { theme, setTheme } = useTheme();
   const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAuthNavigation = (mode: "login" | "register") => {
+    navigate({ pathname: "/auth", search: `?mode=${mode}` });
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,6 +64,7 @@ export const Header = () => {
                 variant="ghost"
                 size="sm"
                 className="h-8 rounded-full px-3 text-xs font-medium transition-colors hover:bg-primary/10"
+                onClick={() => handleAuthNavigation("login")}
               >
                 <LogIn className="mr-1.5 h-3.5 w-3.5" />
                 Sign In
@@ -67,6 +73,7 @@ export const Header = () => {
                 variant="gradient"
                 size="sm"
                 className="h-8 rounded-full px-3 text-xs font-medium shadow-lg shadow-primary/20"
+                onClick={() => handleAuthNavigation("register")}
               >
                 <UserPlus className="mr-1.5 h-3.5 w-3.5" />
                 Sign Up
