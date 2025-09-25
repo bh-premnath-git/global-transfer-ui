@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ArrowUpDown, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTransfers } from "@/hooks/useTransfers";
 import { CURRENCIES, FEE_RATES } from "@/constants";
+import { useAuth } from "@/hooks/useAuth";
 
 export const CurrencyConverter = () => {
   const [sendAmount, setSendAmount] = useState("1000");
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("EUR");
-  
+
   const { useExchangeRate, createTransfer, isCreatingTransfer } = useTransfers();
+  const { isAuthenticated } = useAuth();
   
   // Get exchange rate from API
   const { data: exchangeRateData, isLoading: isLoadingRate } = useExchangeRate(fromCurrency, toCurrency);
@@ -151,10 +153,19 @@ export const CurrencyConverter = () => {
                 variant="gradient"
                 className="w-full h-9"
                 onClick={handleStartTransfer}
-                disabled={isCreatingTransfer || numSendAmount <= 0}
+                disabled={!isAuthenticated || isCreatingTransfer || numSendAmount <= 0}
               >
-                {isCreatingTransfer ? "Creating..." : "Start transfer"}
+                {isAuthenticated
+                  ? isCreatingTransfer
+                    ? "Creating..."
+                    : "Start transfer"
+                  : "Log in to start"}
               </Button>
+              {!isAuthenticated ? (
+                <p className="text-[11px] text-muted-foreground text-center">
+                  Sign in or create an account to begin a transfer.
+                </p>
+              ) : null}
             </CardContent>
           </Card>
         </div>

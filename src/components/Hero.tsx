@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useEffect, useRef, useState } from "react";
 import Autoplay from "embla-carousel-autoplay";
+import type { EmblaCarouselType } from "embla-carousel";
 import heroImage from "@/assets/hero-bg.jpg";
+import { useNavigate } from "react-router-dom";
 
 const promotionalOffers = [
   {
@@ -21,11 +23,12 @@ const promotionalOffers = [
 ];
 
 export const Hero = () => {
-  const [api, setApi] = useState<any>();
+  const [api, setApi] = useState<EmblaCarouselType>();
   const [current, setCurrent] = useState(0);
   const autoplayRef = useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
   );
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!api) return;
@@ -103,7 +106,12 @@ export const Hero = () => {
           </div>
 
           <div className="flex justify-center">
-            <Button size="default" variant="gradient" className="h-10 rounded-full px-6 text-sm font-medium shadow-lg shadow-primary/30">
+            <Button
+              size="default"
+              variant="gradient"
+              className="h-10 rounded-full px-6 text-sm font-medium shadow-lg shadow-primary/30"
+              onClick={() => navigate({ pathname: "/auth", search: "?mode=login" })}
+            >
               Start transfer
               <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
             </Button>
