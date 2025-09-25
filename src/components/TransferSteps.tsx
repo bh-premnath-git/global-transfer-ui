@@ -23,7 +23,7 @@ const steps = [
 
 export const TransferSteps = () => {
   const { transfers, isLoading } = useTransfers();
-  const completedTransfers = transfers?.filter(t => t.status === 'completed').length || 0;
+  const completedTransfers = Array.isArray(transfers) ? transfers.filter(t => t.status === 'completed').length : 0;
 
   return (
     <section className="py-4 lg:py-6 bg-muted/20">
@@ -63,7 +63,7 @@ export const TransferSteps = () => {
           </div>
           
           {/* Live transfer stats */}
-          {!isLoading && transfers && transfers.length > 0 && (
+          {!isLoading && Array.isArray(transfers) && transfers.length > 0 && (
             <div className="mt-3 text-center">
               <p className="text-xs text-muted-foreground">
                 {transfers.length} total •
