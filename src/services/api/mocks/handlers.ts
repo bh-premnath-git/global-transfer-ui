@@ -2,6 +2,22 @@ import { http, HttpResponse, graphql } from 'msw';
 import { API_ENDPOINTS } from '@/constants';
 import { Transfer, User, ExchangeRate, Recipient } from '@/types';
 
+const resolveEndpoint = (endpoint: string) => {
+  if (endpoint.startsWith('http')) {
+    return endpoint;
+  }
+
+  const baseURL = import.meta.env.VITE_API_BASE_URL ?? '/api';
+  const normalizedBase = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  if (!normalizedBase) {
+    return normalizedEndpoint;
+  }
+
+  return `${normalizedBase}${normalizedEndpoint}`;
+};
+
 // Mock data
 const mockUser: User = {
   id: '1',
@@ -39,7 +55,7 @@ const mockRecipients: Recipient[] = [
 
 export const handlers = [
   // Auth endpoints
-  http.post(API_ENDPOINTS.AUTH.LOGIN, async ({ request }) => {
+  http.post(resolveEndpoint(API_ENDPOINTS.AUTH.LOGIN), async ({ request }) => {
     const body = await request.json() as { email: string; password: string };
     
     if (body.email === 'user@example.com' && body.password === 'password') {
@@ -63,7 +79,7 @@ export const handlers = [
     );
   }),
 
-  http.post(API_ENDPOINTS.AUTH.REGISTER, async ({ request }) => {
+  http.post(resolveEndpoint(API_ENDPOINTS.AUTH.REGISTER), async ({ request }) => {
     const body = await request.json() as { email: string; password: string; name: string };
     
     return HttpResponse.json({
@@ -76,7 +92,7 @@ export const handlers = [
     });
   }),
 
-  http.get(API_ENDPOINTS.AUTH.ME, () => {
+  http.get(resolveEndpoint(API_ENDPOINTS.AUTH.ME), () => {
     return HttpResponse.json({
       success: true,
       data: mockUser,
@@ -85,7 +101,7 @@ export const handlers = [
   }),
 
   // Transfer endpoints
-  http.get(API_ENDPOINTS.TRANSFERS.LIST, () => {
+  http.get(resolveEndpoint(API_ENDPOINTS.TRANSFERS.LIST), () => {
     return HttpResponse.json({
       success: true,
       data: mockTransfers,
@@ -93,7 +109,7 @@ export const handlers = [
     });
   }),
 
-  http.post(API_ENDPOINTS.TRANSFERS.CREATE, async ({ request }) => {
+  http.post(resolveEndpoint(API_ENDPOINTS.TRANSFERS.CREATE), async ({ request }) => {
     const body = await request.json() as any;
     
     const newTransfer: Transfer = {
@@ -115,7 +131,7 @@ export const handlers = [
     });
   }),
 
-  http.get(API_ENDPOINTS.TRANSFERS.RATES, ({ request }) => {
+  http.get(resolveEndpoint(API_ENDPOINTS.TRANSFERS.RATES), ({ request }) => {
     const url = new URL(request.url);
     const from = url.searchParams.get('from') || 'USD';
     const to = url.searchParams.get('to') || 'EUR';
@@ -136,7 +152,7 @@ export const handlers = [
   }),
 
   // Recipients endpoints
-  http.get(API_ENDPOINTS.RECIPIENTS.LIST, () => {
+  http.get(resolveEndpoint(API_ENDPOINTS.RECIPIENTS.LIST), () => {
     return HttpResponse.json({
       success: true,
       data: mockRecipients,
