@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { fetchTransfers, createTransfer, fetchExchangeRate, fetchRecipients } from '@/store/slices/transferSlice';
+import { fetchTransfers, createTransfer, fetchExchangeRate, fetchRecipients, updateTransferStatus } from '@/store/slices/transferSlice';
 import { TransferRequest } from '@/types';
+import { useCallback } from 'react';
 
 export const useTransfers = () => {
   const dispatch = useAppDispatch();
@@ -9,7 +10,7 @@ export const useTransfers = () => {
   const transferState = useAppSelector((state) => state.transfer);
 
   // Fetch transfers query
-  const { data: transfers, isLoading: isLoadingTransfers } = useQuery({
+  const { data: transfers, isLoading: isLoadingTransfers, refetch: refetchTransfers } = useQuery({
     queryKey: ['transfers'],
     queryFn: () => dispatch(fetchTransfers()).unwrap(),
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -53,6 +54,12 @@ export const useTransfers = () => {
     // Actions
     createTransfer: createTransferMutation.mutate,
     useExchangeRate,
+    updateStatus: useCallback(
+      (transferId: string, status: 'pending' | 'processing' | 'completed' | 'failed') =>
+        dispatch(updateTransferStatus({ id: transferId, status })),
+      [dispatch],
+    ),
+    refetchTransfers,
 
     // Mutation states
     isCreatingTransfer: createTransferMutation.isPending,

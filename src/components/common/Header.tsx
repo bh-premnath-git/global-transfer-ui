@@ -1,15 +1,41 @@
 import { Link } from "react-router-dom";
-import { Sun, Moon, LogIn, UserPlus, Building2 } from "lucide-react";
+import { Sun, Moon, LogIn, UserPlus, Building2, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { APP_NAME } from "@/constants";
 import { useAuthDialog } from "@/providers/AuthDialogProvider";
+import { useAccount } from "@/hooks/useAccount";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Header = () => {
   const { theme, setTheme } = useTheme();
   const { isAuthenticated, user, logout } = useAuth();
   const { openAuth } = useAuthDialog();
+  const { wallet, isLoading: isLoadingAccount } = useAccount();
+
+  const renderWalletBadge = () => {
+    if (!wallet && !isLoadingAccount) {
+      return null;
+    }
+
+    return (
+      <div className="hidden items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2 py-1 text-[11px] font-medium text-muted-foreground sm:flex">
+        <Wallet className="h-3 w-3 text-primary" />
+        {wallet ? (
+          <span>
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: wallet.currency,
+              maximumFractionDigits: 2,
+            }).format(wallet.balance)}
+          </span>
+        ) : (
+          <Skeleton className="h-3 w-16" />
+        )}
+      </div>
+    );
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -42,6 +68,7 @@ export const Header = () => {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-2 rounded-full border border-border/60 bg-card/80 px-2.5 py-1 shadow-sm backdrop-blur">
+              {renderWalletBadge()}
               <div className="hidden text-right sm:block">
                 <span className="block text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Welcome</span>
                 <span className="block text-xs font-semibold text-foreground">{user?.name}</span>
