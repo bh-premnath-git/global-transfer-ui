@@ -1,6 +1,13 @@
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { loginUser, registerUser, logoutUser, getCurrentUser } from '@/store/slices/authSlice';
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+  getCurrentUser,
+  clearError,
+} from '@/store/slices/authSlice';
 import { LoginCredentials, RegisterCredentials } from '@/types';
 
 export const useAuth = () => {
@@ -40,6 +47,10 @@ export const useAuth = () => {
     },
   });
 
+  const handleClearError = useCallback(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
   return {
     // State
     user: authState.user,
@@ -51,6 +62,7 @@ export const useAuth = () => {
     login: loginMutation.mutate,
     register: registerMutation.mutate,
     logout: logoutMutation.mutate,
+    clearError: handleClearError,
 
     // Mutation states
     isLoggingIn: loginMutation.isPending,
