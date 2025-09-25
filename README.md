@@ -52,7 +52,7 @@ A Vite + React + TypeScript single-page application that showcases a global mone
    npm run dev
    ```
    - Opens the app with hot module reloading.
-   - [MSW](https://mswjs.io/) mocks are automatically registered (see `src/services/api/mocks`).
+   - [MSW](https://mswjs.io/) mocks are automatically registered (see `src/services/api/mocks`). Set `VITE_ENABLE_API_MOCKS=false` in a `.env` file to disable mocks and forward requests to a live backend.
 3. **Build for production**
    ```bash
    npm run build
@@ -71,7 +71,7 @@ A Vite + React + TypeScript single-page application that showcases a global mone
 - REST requests are centralized in `src/services/api/restClient.ts` and GraphQL in `src/services/api/graphqlClient.ts`.
 - Domain services (e.g., `transferService`, `authService`) expose typed methods used by Redux thunks and React Query hooks.
 - During local development, MSW (`src/services/api/mocks`) intercepts network calls, returning mock auth, transfer, recipient, and exchange-rate data so the UI functions without a live backend.
-- Swap out or extend mocks when integrating real APIs.
+- Swap out or extend mocks when integrating real APIs. Configure `VITE_API_BASE_URL` to point to your backend and set `VITE_ENABLE_API_MOCKS=false` to bypass the mock service worker.
 
 ## Customization Tips
 - Update supported currencies in `src/constants/index.ts`.

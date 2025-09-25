@@ -5,8 +5,11 @@ import App from './App.tsx';
 import { AppProviders } from './providers/AppProviders';
 import './index.css';
 
-// Start MSW in development
-if (import.meta.env.DEV) {
+// Start MSW in development when enabled
+const shouldEnableMocks =
+  import.meta.env.DEV && import.meta.env.VITE_ENABLE_API_MOCKS !== 'false';
+
+if (shouldEnableMocks) {
   import('./services/api/mocks/browser').then(({ worker }) => {
     worker.start({
       onUnhandledRequest: 'bypass',
