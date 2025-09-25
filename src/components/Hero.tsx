@@ -1,4 +1,4 @@
-import { ArrowRight, Globe, Star, Zap, Shield } from "lucide-react";
+import { ArrowRight, Globe, Star, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useEffect, useRef, useState } from "react";
@@ -8,28 +8,21 @@ import heroImage from "@/assets/hero-bg.jpg";
 const promotionalOffers = [
   {
     icon: Star,
-    title: "0% fees on first transfer",
+    title: "New User get exciting rates on your first three transfers",
     description: "New users only",
     color: "text-yellow-500"
   },
   {
     icon: Zap,
-    title: "Instant transfers",
-    description: "To 50+ countries",
+    title: "A referral can get you 0 fees for your next 2 transactions",
+    description: "referral only",
     color: "text-blue-500"
-  },
-  {
-    icon: Shield,
-    title: "Bank-level security",
-    description: "Your money is safe",
-    color: "text-green-500"
   }
 ];
 
 export const Hero = () => {
   const [api, setApi] = useState<any>();
   const [current, setCurrent] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
   const autoplayRef = useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
   );
@@ -59,13 +52,15 @@ export const Hero = () => {
           </div>
 
           <h1 className="mb-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
-            Send money worldwide
+            Send money care free
           </h1>
+
+          <p className="mb-4 text-sm text-muted-foreground">
+            Best Rate, Reliable Services, online and cash money transfers
+          </p>
 
           <div
             className="mb-3"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
           >
             <Carousel
               className="w-full max-w-sm mx-auto"
@@ -76,12 +71,12 @@ export const Hero = () => {
               <CarouselContent>
                 {promotionalOffers.map((offer, index) => (
                   <CarouselItem key={index}>
-                    <div className="flex flex-col items-center text-center p-2 cursor-pointer transition-transform hover:scale-105">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <offer.icon className={`h-4 w-4 ${offer.color} transition-colors`} />
-                        <span className="text-sm font-medium text-foreground">{offer.title}</span>
+                    <div className="flex flex-col items-center justify-center text-center p-3 cursor-pointer transition-transform hover:scale-105 min-h-[80px] space-y-2">
+                      <div className="flex flex-col items-center gap-2">
+                        <offer.icon className={`h-4 w-4 ${offer.color} transition-colors flex-shrink-0`} />
+                        <span className="text-sm font-medium text-foreground text-center leading-tight max-w-[240px]">{offer.title}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground">{offer.description}</span>
+                      <span className="text-xs text-muted-foreground text-center mt-auto">{offer.description}</span>
                     </div>
                   </CarouselItem>
                 ))}
@@ -107,17 +102,10 @@ export const Hero = () => {
             </div>
           </div>
 
-          <div className="flex flex-col justify-center gap-2.5 sm:flex-row sm:gap-3">
+          <div className="flex justify-center">
             <Button size="default" variant="gradient" className="h-10 rounded-full px-6 text-sm font-medium shadow-lg shadow-primary/30">
               Start transfer
               <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="default"
-              className="h-10 rounded-full border-border/60 bg-card/80 px-6 text-sm font-medium transition-all duration-300 hover:shadow-md"
-            >
-              View rates
             </Button>
           </div>
 
