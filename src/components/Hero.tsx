@@ -42,12 +42,12 @@ export const Hero = () => {
 
   return (
     <section
-      className="relative overflow-hidden bg-cover bg-center bg-no-repeat"
+      className="relative overflow-hidden bg-cover bg-center bg-no-repeat before:absolute before:inset-0 before:bg-gradient-to-b before:from-background/92 before:to-background/90"
       style={{
-        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.9)), url(${heroImage})`,
+        backgroundImage: `url(${heroImage})`,
       }}
     >
-      <div className="container mx-auto px-4 py-6 sm:py-8 lg:py-12">
+      <div className="container relative z-10 mx-auto px-4 py-6 sm:py-8 lg:py-12">
         <div className="mx-auto max-w-4xl rounded-2xl border border-border/40 bg-background/80 p-4 text-center shadow-xl backdrop-blur-sm sm:p-6 lg:p-8">
           <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
             <Globe className="h-3.5 w-3.5" />
