@@ -1,7 +1,12 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,11 +14,23 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { APP_NAME } from "@/constants";
 
-const Auth = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [formValues, setFormValues] = useState({ name: "", email: "", password: "" });
+export type AuthMode = "login" | "register";
 
+interface AuthDialogProps {
+  open: boolean;
+  mode: AuthMode;
+  onOpenChange: (open: boolean) => void;
+  onModeChange: (mode: AuthMode) => void;
+}
+
+const INITIAL_VALUES = {
+  name: "",
+  email: "",
+  password: "",
+};
+
+export const AuthDialog = ({ open, mode, onOpenChange, onModeChange }: AuthDialogProps) => {
+  const [formValues, setFormValues] = useState(INITIAL_VALUES);
   const {
     login,
     register: registerUser,
@@ -24,31 +41,51 @@ const Auth = () => {
     clearError,
   } = useAuth();
 
-  const mode = searchParams.get("mode") === "register" ? "register" : "login";
   const isRegisterMode = mode === "register";
   const isSubmitting = isRegisterMode ? isRegistering : isLoggingIn;
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/", { replace: true });
+    if (isAuthenticated && open) {
+      onOpenChange(false);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, open, onOpenChange]);
 
   useEffect(() => {
-    return () => {
-      clearError();
-    };
-  }, [clearError]);
+    if (!open) {
+      setFormValues(INITIAL_VALUES);
+      if (error) {
+        clearError();
+      }
+      if (mode !== "login") {
+        onModeChange("login");
+      }
+    }
+  }, [open, error, clearError, mode, onModeChange]);
 
-  const handleModeChange = (nextMode: "login" | "register") => {
+  const heading = useMemo(
+    () => (isRegisterMode ? "Create your account" : "Welcome back"),
+    [isRegisterMode]
+  );
+
+  const description = useMemo(
+    () =>
+      isRegisterMode
+        ? `Join ${APP_NAME} to send money worldwide in minutes.`
+        : "Sign in to manage transfers and recipients.",
+    [isRegisterMode]
+  );
+
+  const handleModeChange = (nextMode: AuthMode) => {
     if (nextMode === mode) {
       return;
     }
 
-    const params = new URLSearchParams(searchParams);
-    params.set("mode", nextMode);
-    setSearchParams(params, { replace: true });
-    setFormValues((prev) => ({ ...prev, password: "" }));
+    onModeChange(nextMode);
+    setFormValues((prev) => ({
+      ...prev,
+      password: "",
+      ...(nextMode === "login" ? { name: "" } : {}),
+    }));
     clearError();
   };
 
@@ -70,32 +107,21 @@ const Auth = () => {
     });
   };
 
-  const heading = useMemo(
-    () => (isRegisterMode ? "Create your account" : "Welcome back"),
-    [isRegisterMode]
-  );
-
-  const description = useMemo(
-    () =>
-      isRegisterMode
-        ? `Join ${APP_NAME} to send money worldwide in minutes.`
-        : "Sign in to manage transfers and recipients.",
-    [isRegisterMode]
-  );
-
   return (
-    <section className="flex min-h-[calc(100vh-56px)] items-center justify-center bg-muted/20 px-4 py-12">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-semibold">{heading}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 flex justify-center gap-2">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md border border-border/60 bg-background/95 p-0 shadow-2xl">
+        <div className="flex flex-col gap-6 p-6">
+          <DialogHeader className="space-y-1 text-center">
+            <DialogTitle className="text-2xl font-semibold tracking-tight">{heading}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex items-center justify-center gap-2 rounded-full border border-border/60 bg-muted/40 p-1">
             <Button
               type="button"
-              variant={isRegisterMode ? "outline" : "gradient"}
+              variant={isRegisterMode ? "ghost" : "gradient"}
               size="sm"
+              className="h-8 rounded-full px-4 text-xs font-medium"
               onClick={() => handleModeChange("login")}
               disabled={isSubmitting}
             >
@@ -103,8 +129,9 @@ const Auth = () => {
             </Button>
             <Button
               type="button"
-              variant={isRegisterMode ? "gradient" : "outline"}
+              variant={isRegisterMode ? "gradient" : "ghost"}
               size="sm"
+              className="h-8 rounded-full px-4 text-xs font-medium"
               onClick={() => handleModeChange("register")}
               disabled={isSubmitting}
             >
@@ -113,7 +140,7 @@ const Auth = () => {
           </div>
 
           {error ? (
-            <Alert variant="destructive" className="mb-4">
+            <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
@@ -126,7 +153,9 @@ const Auth = () => {
                   id="name"
                   placeholder="Jane Doe"
                   value={formValues.name}
-                  onChange={(event) => setFormValues((prev) => ({ ...prev, name: event.target.value }))}
+                  onChange={(event) =>
+                    setFormValues((prev) => ({ ...prev, name: event.target.value }))
+                  }
                   disabled={isSubmitting}
                   required
                 />
@@ -140,7 +169,9 @@ const Auth = () => {
                 type="email"
                 placeholder="you@example.com"
                 value={formValues.email}
-                onChange={(event) => setFormValues((prev) => ({ ...prev, email: event.target.value }))}
+                onChange={(event) =>
+                  setFormValues((prev) => ({ ...prev, email: event.target.value }))
+                }
                 disabled={isSubmitting}
                 required
               />
@@ -153,7 +184,9 @@ const Auth = () => {
                 type="password"
                 placeholder="Enter your password"
                 value={formValues.password}
-                onChange={(event) => setFormValues((prev) => ({ ...prev, password: event.target.value }))}
+                onChange={(event) =>
+                  setFormValues((prev) => ({ ...prev, password: event.target.value }))
+                }
                 disabled={isSubmitting}
                 minLength={6}
                 required
@@ -164,10 +197,8 @@ const Auth = () => {
               {isSubmitting ? "Please wait..." : isRegisterMode ? "Create account" : "Sign in"}
             </Button>
           </form>
-        </CardContent>
-      </Card>
-    </section>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
-
-export default Auth;
