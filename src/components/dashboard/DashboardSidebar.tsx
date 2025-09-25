@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Clock, RefreshCw } from "lucide-react";
+import { ArrowUpRight, Clock, RefreshCw, Wallet, Receipt, ArrowLeftRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,8 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarProvider,
-  SidebarRail,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -22,20 +21,32 @@ import { useAccount } from "@/hooks/useAccount";
 import { useTransfers } from "@/hooks/useTransfers";
 import { useMemo } from "react";
 
-const formatCurrency = (value: number, currency: string) =>
-  new Intl.NumberFormat("en-US", {
+const formatCurrency = (value: number, currency?: string) => {
+  if (!currency) {
+    return new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
     maximumFractionDigits: 2,
   }).format(value);
+};
 
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat("en-US", {
+const formatDate = (value: string) => {
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    return "Invalid date";
+  }
+  return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-  }).format(new Date(value));
+  }).format(date);
+};
 
 export const DashboardSidebar = ({ children }: { children: React.ReactNode }) => {
   const { wallet, ledger, isLoading: isLoadingAccount, refetchLedger, refetchWallet } = useAccount();
@@ -52,61 +63,46 @@ export const DashboardSidebar = ({ children }: { children: React.ReactNode }) =>
   }, [ledger]);
 
   return (
-    <SidebarProvider>
-      <Sidebar collapsible="icon" className="bg-muted/40">
-        <SidebarHeader className="space-y-2">
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Wallet</h3>
-            {wallet ? (
-              <p className="text-lg font-semibold text-foreground">
-                {formatCurrency(wallet.balance, wallet.currency)}
-              </p>
-            ) : (
-              <Skeleton className="h-5 w-24" />
-            )}
-            <div className="text-[11px] text-muted-foreground">
-              <span>Ledger balance </span>
-              {wallet ? (
-                <span className="font-semibold text-foreground/80">
-                  {formatCurrency(wallet.ledgerBalance, wallet.currency)}
-                </span>
-              ) : (
-                <Skeleton className="mt-1 h-3 w-16" />
-              )}
+    <>
+      <Sidebar collapsible="icon" className="bg-muted/40 top-14 h-[calc(100vh-3.5rem)] [&_[data-sidebar=rail]]:!hidden [&_*]:!cursor-default">
+        <SidebarTrigger className="absolute top-4 -right-3 z-20 h-6 w-6 rounded-full border border-border bg-background shadow-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200" />
+        <SidebarHeader className="p-3">
+          <SidebarMenuButton
+            size="lg"
+            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2"
+          >
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <Wallet className="size-4" />
             </div>
-          </div>
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>
-              Updated {wallet ? formatDate(wallet.lastUpdated) : "soon"}
-            </span>
-          </div>
-          <div className="flex gap-2">
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">
+                {wallet ? formatCurrency(wallet.balance, wallet.currency) : 'Loading...'}
+              </span>
+              <span className="truncate text-xs">
+                {wallet ? `Ledger: ${formatCurrency(wallet.ledgerBalance, wallet.currency)}` : 'Wallet Balance'}
+              </span>
+            </div>
             <Button
               size="sm"
-              variant="outline"
-              className="h-7 flex-1 text-[11px]"
-              onClick={() => {
+              variant="ghost"
+              className="h-6 w-6 p-0 hover:bg-primary/10 group-data-[collapsible=icon]:hidden"
+              onClick={(e) => {
+                e.stopPropagation();
                 refetchWallet();
                 refetchLedger();
               }}
             >
-              <RefreshCw className="mr-1 h-3 w-3" />
-              Refresh
+              <RefreshCw className="h-3 w-3" />
             </Button>
-            {wallet ? (
-              <Badge variant="secondary" className="h-7 rounded-full px-3 text-[11px]">
-                Pending {formatCurrency(wallet.pending, wallet.currency)}
-              </Badge>
-            ) : (
-              <Skeleton className="h-7 w-20 rounded-full" />
-            )}
-          </div>
+          </SidebarMenuButton>
         </SidebarHeader>
         <Separator className="mx-2" />
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Recent ledger</SidebarGroupLabel>
+            <SidebarGroupLabel className="flex items-center gap-2">
+              <Receipt className="size-4" />
+              Recent ledger
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {isLoadingAccount && !recentLedger.length ? (
@@ -137,8 +133,11 @@ export const DashboardSidebar = ({ children }: { children: React.ReactNode }) =>
           </SidebarGroup>
           <SidebarGroup>
             <SidebarGroupLabel className="flex items-center justify-between">
-              <span>Latest transfers</span>
-              <Badge variant="outline" className="text-[11px]">
+              <div className="flex items-center gap-2">
+                <ArrowLeftRight className="size-4" />
+                <span>Latest transfers</span>
+              </div>
+              <Badge variant="outline" className="text-[11px] group-data-[collapsible=icon]:hidden">
                 {Array.isArray(transfers) ? transfers.length : 0} total
               </Badge>
             </SidebarGroupLabel>
@@ -191,12 +190,11 @@ export const DashboardSidebar = ({ children }: { children: React.ReactNode }) =>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="text-[11px] text-muted-foreground">
-          <p>Track balances and history from here. Collapse for more space when you need it.</p>
+        <SidebarFooter className="text-[11px] text-muted-foreground group-data-[collapsible=icon]:hidden">
+          <p>Track balances and history from here. Use the toggle button to collapse for more space.</p>
         </SidebarFooter>
-        <SidebarRail />
-      </Sidebar>
+        </Sidebar>
       {children}
-    </SidebarProvider>
+    </>
   );
 };

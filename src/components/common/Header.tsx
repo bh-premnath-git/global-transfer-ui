@@ -22,7 +22,7 @@ export const Header = () => {
     return (
       <div className="hidden items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2 py-1 text-[11px] font-medium text-muted-foreground sm:flex">
         <Wallet className="h-3 w-3 text-primary" />
-        {wallet ? (
+        {wallet && wallet.currency ? (
           <span>
             {new Intl.NumberFormat("en-US", {
               style: "currency",
