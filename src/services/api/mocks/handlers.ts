@@ -135,27 +135,53 @@ const mockRecipients: Recipient[] = [
 export const handlers = [
   // Auth endpoints
   http.post(resolveEndpoint(API_ENDPOINTS.AUTH.LOGIN), async ({ request }) => {
-    const body = await request.json() as { email: string; password: string };
-    
-    if (body.email === 'user@example.com' && body.password === 'password') {
-      return HttpResponse.json({
-        success: true,
-        data: {
-          user: mockUser,
-          token: 'mock-jwt-token',
+    try {
+      const body = await request.json() as { email: string; password: string };
+
+      if (body.email === 'user@example.com' && body.password === 'password') {
+        return HttpResponse.json({
+          success: true,
+          data: {
+            user: mockUser,
+            token: 'mock-jwt-token',
+          },
+          message: 'Login successful',
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
+      return HttpResponse.json(
+        {
+          success: false,
+          data: null,
+          message: 'Invalid credentials',
         },
-        message: 'Login successful',
-      });
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Login handler error:', error);
+      return HttpResponse.json(
+        {
+          success: false,
+          data: null,
+          message: 'Server error',
+        },
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     }
-    
-    return HttpResponse.json(
-      {
-        success: false,
-        data: null,
-        message: 'Invalid credentials',
-      },
-      { status: 401 }
-    );
   }),
 
   http.post(resolveEndpoint(API_ENDPOINTS.AUTH.REGISTER), async ({ request }) => {
