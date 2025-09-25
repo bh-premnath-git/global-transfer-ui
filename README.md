@@ -53,6 +53,7 @@ A Vite + React + TypeScript single-page application that showcases a global mone
    ```
    - Opens the app with hot module reloading.
    - [MSW](https://mswjs.io/) mocks are automatically registered (see `src/services/api/mocks`). Set `VITE_ENABLE_API_MOCKS=false` in a `.env` file to disable mocks and forward requests to a live backend.
+   - Configure REST and GraphQL endpoints with `VITE_API_BASE_URL` (REST) and `VITE_GRAPHQL_URL` (GraphQL). When `VITE_GRAPHQL_URL` is omitted, the client falls back to `/graphql` or derives an absolute URL from `VITE_API_BASE_URL` when it points to a remote host.
 3. **Build for production**
    ```bash
    npm run build
