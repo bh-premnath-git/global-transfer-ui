@@ -1,30 +1,54 @@
+import { useState, createContext, useContext } from 'react';
 import { Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/common/Header";
 import { AuthDialogProvider } from "@/providers/AuthDialogProvider";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+
+interface SidebarContextType {
+  isCollapsed: boolean;
+  toggleCollapse: () => void;
+}
+
+const SidebarContext = createContext<SidebarContextType>({
+  isCollapsed: false,
+  toggleCollapse: () => {},
+});
+
+export const useSidebarState = () => useContext(SidebarContext);
 
 const AuthenticatedLayout = () => {
-  const { open, isMobile } = useSidebar();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleCollapse = () => setIsCollapsed(prev => !prev);
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
-      {/* Fixed Sidebar */}
-      <DashboardSidebar />
+    <SidebarContext.Provider value={{ isCollapsed, toggleCollapse }}>
+      <div className="flex h-screen overflow-hidden">
+        {/* Sidebar - Fixed width that changes on collapse */}
+        <DashboardSidebar />
 
-      {/* Main Content Area with dynamic sidebar offset */}
-      <div
-        className={`transition-all duration-300 ${
-          isMobile ? 'ml-0' : open ? 'lg:ml-64' : 'lg:ml-0'
-        }`}
-      >
-        <Header />
-        <main className="flex-1">
-          <Outlet />
-        </main>
+        {/* Main Content - Dynamically adjusts based on sidebar */}
+        <div
+          className={cn(
+            "flex-1 flex flex-col overflow-hidden",
+            "transition-all duration-300 ease-in-out",
+            isCollapsed ? "ml-16" : "ml-64"
+          )}
+        >
+          {/* Header */}
+          <div className="flex-shrink-0">
+            <Header />
+          </div>
+
+          {/* Main Content Area */}
+          <main className="flex-1 overflow-y-auto">
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarContext.Provider>
   );
 };
 
@@ -46,9 +70,7 @@ const AppLayout = () => {
 
   return (
     <AuthDialogProvider>
-      <SidebarProvider>
-        <AuthenticatedLayout />
-      </SidebarProvider>
+      <AuthenticatedLayout />
     </AuthDialogProvider>
   );
 };
