@@ -4,6 +4,7 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
+  wallet?: WalletSummary;
 }
 
 // Auth types
@@ -43,6 +44,7 @@ export interface Transfer {
   totalAmount: number;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   recipientId: string;
+  recipientDetails?: TransferRecipient;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,6 +54,7 @@ export interface TransferRequest {
   toCurrency: string;
   sendAmount: number;
   recipientId: string;
+  recipientDetails?: TransferRecipient;
 }
 
 export interface ExchangeRate {
@@ -77,6 +80,39 @@ export interface TransferState {
   currentTransfer: Transfer | null;
   exchangeRates: Record<string, ExchangeRate>;
   recipients: Recipient[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface WalletSummary {
+  balance: number;
+  currency: string;
+  pending: number;
+  ledgerBalance: number;
+  lastUpdated: string;
+}
+
+export interface LedgerEntry {
+  id: string;
+  type: 'credit' | 'debit';
+  amount: number;
+  currency: string;
+  description: string;
+  reference: string;
+  createdAt: string;
+}
+
+export interface TransferRecipient {
+  name: string;
+  email: string;
+  accountNumber: string;
+  country: string;
+  bankName?: string;
+}
+
+export interface AccountState {
+  wallet: WalletSummary | null;
+  ledger: LedgerEntry[];
   loading: boolean;
   error: string | null;
 }

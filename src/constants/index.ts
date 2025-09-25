@@ -36,6 +36,10 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `/transfers/${id}`,
     RATES: '/transfers/rates',
   },
+  ACCOUNTS: {
+    WALLET: '/wallet',
+    LEDGER: '/wallet/ledger',
+  },
   RECIPIENTS: {
     LIST: '/recipients',
     CREATE: '/recipients',

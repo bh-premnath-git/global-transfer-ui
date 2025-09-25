@@ -23,20 +23,20 @@ class TransferService {
 
   // GraphQL method for exchange rates
   async getExchangeRateGraphQL(from: string, to: string): Promise<ExchangeRate> {
-    const { data } = await graphqlClient.query({
+    const { data } = await graphqlClient.query<{ exchangeRates: ExchangeRate }>({
       query: gql(GRAPHQL_OPERATIONS.GET_EXCHANGE_RATES),
       variables: { from, to },
     });
-    return (data as any).exchangeRates;
+    return data.exchangeRates;
   }
 
   // GraphQL method for creating transfer
   async createTransferGraphQL(transferData: TransferRequest): Promise<Transfer> {
-    const { data } = await graphqlClient.mutate({
+    const { data } = await graphqlClient.mutate<{ createTransfer: Transfer }>({
       mutation: gql(GRAPHQL_OPERATIONS.CREATE_TRANSFER),
       variables: { input: transferData },
     });
-    return (data as any).createTransfer;
+    return data.createTransfer;
   }
 
   async getRecipients(): Promise<ApiResponse<Recipient[]>> {
