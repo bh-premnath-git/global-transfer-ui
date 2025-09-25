@@ -4,7 +4,8 @@ A Vite + React + TypeScript single-page application that showcases a global mone
 
 ## Features
 - **Hero landing page:** Marketing headline, conversion CTAs, and quick stats rendered with reusable UI primitives (`Hero`).
-- **Interactive currency converter:** Supports currency selection, swap, transfer fee breakdown, and invokes transfer creation through Redux Toolkit/React Query powered actions (`CurrencyConverter`).
+- **Interactive currency converter:** Supports currency selection, swap, transfer fee breakdown, and invokes transfer creation through Redux Toolkit/React Query powered actions (`CurrencyConverter`). Transfer initiation is gated behind authentication so visitors are guided to sign in before starting a send.
+- **Authentication & onboarding:** Dedicated `/auth` route with shared sign-in/sign-up form logic powered by the auth hook. Header and hero CTAs deep-link into the experience, and once authenticated the marketing hero hides to focus on transfer tools.
 - **Guided transfer steps:** Responsive cards outlining the three-step send flow with live completion stats driven by mocked transfer data (`TransferSteps`).
 - **State & data layer:** Redux Toolkit slices for auth and transfer domains combined with TanStack Query for caching, mutations, and background revalidation (`useAuth`, `useTransfers`).
 - **API abstractions:** REST and GraphQL clients with MSW-powered mocks to simulate login, transfer, recipient, and exchange-rate endpoints during development.
