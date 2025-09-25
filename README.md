@@ -8,6 +8,7 @@ A modern, full-stack financial transfer application built with React, TypeScript
 - **State Management**: Redux Toolkit with React-Redux for global state management
 - **Server State**: TanStack Query for efficient data fetching, caching, and synchronization
 - **UI Components**: shadcn/ui component library with Tailwind CSS styling
+- **Authentication UX**: Modal-based sign-in and sign-up dialog that can be triggered from anywhere in the app
 - **API Integration**: REST and GraphQL clients with MSW for development mocking
 - **Theme Support**: Dark/light mode with next-themes
 - **Development Tools**: ESLint, TypeScript, hot module reloading
@@ -41,8 +42,10 @@ A modern, full-stack financial transfer application built with React, TypeScript
 │   │   ├── Hero.tsx        # Landing page hero section
 │   │   ├── CurrencyConverter.tsx  # Currency conversion component
 │   │   ├── TransferSteps.tsx      # Transfer workflow component
+│   │   ├── auth/
+│   │   │   └── AuthDialog.tsx     # Modal experience for sign-in and sign-up
 │   │   ├── common/         # Shared components
-│   │   │   └── Header.tsx  # Navigation header
+│   │   │   └── Header.tsx  # Navigation header with auth triggers
 │   │   └── ui/             # shadcn/ui primitives
 │   │       ├── button.tsx
 │   │       ├── card.tsx
@@ -50,6 +53,7 @@ A modern, full-stack financial transfer application built with React, TypeScript
 │   │       └── ...
 │   ├── providers/          # Context providers
 │   │   ├── AppProviders.tsx     # Root provider wrapper
+│   │   ├── AuthDialogProvider.tsx # Global controls for the auth dialog modal
 │   │   ├── ReactQueryProvider.tsx
 │   │   ├── ReduxProvider.tsx
 │   │   ├── ApolloProvider.tsx
