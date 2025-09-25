@@ -1,85 +1,298 @@
-# TransferPro – Global Money Transfer UI
+# Vite React Shadcn TypeScript Starter
 
-A Vite + React + TypeScript single-page application that showcases a global money transfer experience. The interface highlights competitive currency conversion, onboarding flows, and account management hooks while using modern tooling for state, data, and theme management.
+A modern, full-stack financial transfer application built with React, TypeScript, and shadcn/ui components. This starter template provides a robust foundation for building complex web applications with state management, API integration, and comprehensive UI components.
 
-## Features
-- **Hero landing page:** Marketing headline, conversion CTAs, and quick stats rendered with reusable UI primitives (`Hero`).
-- **Interactive currency converter:** Supports currency selection, swap, transfer fee breakdown, and invokes transfer creation through Redux Toolkit/React Query powered actions (`CurrencyConverter`). Transfer initiation is gated behind authentication so visitors are guided to sign in before starting a send.
-- **Authentication & onboarding:** Dedicated `/auth` route with shared sign-in/sign-up form logic powered by the auth hook. Header and hero CTAs deep-link into the experience, and once authenticated the marketing hero hides to focus on transfer tools.
-- **Guided transfer steps:** Responsive cards outlining the three-step send flow with live completion stats driven by mocked transfer data (`TransferSteps`).
-- **State & data layer:** Redux Toolkit slices for auth and transfer domains combined with TanStack Query for caching, mutations, and background revalidation (`useAuth`, `useTransfers`).
-- **API abstractions:** REST and GraphQL clients with MSW-powered mocks to simulate login, transfer, recipient, and exchange-rate endpoints during development.
-- **Design system:** Tailwind CSS and shadcn/ui components (buttons, cards, badges, inputs, etc.) with dark/light theme switching via `next-themes`.
+## 🚀 Key Features
 
-## Tech Stack
-- [Vite](https://vitejs.dev/) for lightning-fast dev server and build pipeline
-- [React 18](https://react.dev/) with [TypeScript](https://www.typescriptlang.org/)
-- [React Router](https://reactrouter.com/) for client-side routing
-- [Redux Toolkit](https://redux-toolkit.js.org/) and [React Redux](https://react-redux.js.org/) for global state management
-- [TanStack Query](https://tanstack.com/query/latest) for server-state caching and mutations
-- [Apollo Client](https://www.apollographql.com/docs/react/) for optional GraphQL interactions
-- [MSW](https://mswjs.io/) for API mocking in development
-- [Tailwind CSS](https://tailwindcss.com/) and [shadcn/ui](https://ui.shadcn.com/) component patterns for styling
-- [lucide-react](https://lucide.dev/) iconography
+- **Modern React Architecture**: React 18 with TypeScript for type-safe development
+- **State Management**: Redux Toolkit with React-Redux for global state management
+- **Server State**: TanStack Query for efficient data fetching, caching, and synchronization
+- **UI Components**: shadcn/ui component library with Tailwind CSS styling
+- **API Integration**: REST and GraphQL clients with MSW for development mocking
+- **Theme Support**: Dark/light mode with next-themes
+- **Development Tools**: ESLint, TypeScript, hot module reloading
 
-## Project Structure
+## 🛠 Tech Stack
+
+| Category | Technologies |
+|----------|-------------|
+| **Build Tool** | [Vite](https://vitejs.dev/) |
+| **Frontend** | [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) |
+| **Routing** | [React Router](https://reactrouter.com/) |
+| **State Management** | [Redux Toolkit](https://redux-toolkit.js.org/) + [React Redux](https://react-redux.js.org/) |
+| **Server State** | [TanStack Query](https://tanstack.com/query/latest) |
+| **GraphQL** | [Apollo Client](https://www.apollographql.com/docs/react/) |
+| **API Mocking** | [MSW](https://mswjs.io/) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) |
+| **Icons** | [Lucide React](https://lucide.dev/) |
+| **Forms** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
+
+## 📁 Project Structure
+
 ```
 ├── public/                 # Static assets served by Vite
 ├── src/
-│   ├── App.tsx             # Route configuration
-│   ├── pages/              # Route-level components (Index, NotFound)
+│   ├── App.tsx             # Main app component with route configuration
+│   ├── main.tsx            # Application entry point
+│   ├── pages/              # Route-level components
+│   │   ├── Index.tsx       # Home page component
+│   │   └── NotFound.tsx    # 404 page component
 │   ├── components/
-│   │   ├── Hero.tsx
-│   │   ├── CurrencyConverter.tsx
-│   │   ├── TransferSteps.tsx
-│   │   ├── common/         # Shared UI (Header)
-│   │   └── ui/             # shadcn-derived primitives
-│   ├── providers/          # React Query, Redux, Apollo, theme providers
-│   ├── hooks/              # Domain hooks (useAuth, useTransfers)
-│   ├── store/              # Redux Toolkit slices & typed hooks
-│   ├── services/           # REST/GraphQL clients & MSW mocks
-│   ├── constants/          # App constants, endpoints, GraphQL documents
-│   └── types/              # TypeScript interfaces shared across domains
-└── vite.config.ts          # Vite configuration
+│   │   ├── Hero.tsx        # Landing page hero section
+│   │   ├── CurrencyConverter.tsx  # Currency conversion component
+│   │   ├── TransferSteps.tsx      # Transfer workflow component
+│   │   ├── common/         # Shared components
+│   │   │   └── Header.tsx  # Navigation header
+│   │   └── ui/             # shadcn/ui primitives
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── input.tsx
+│   │       └── ...
+│   ├── providers/          # Context providers
+│   │   ├── AppProviders.tsx     # Root provider wrapper
+│   │   ├── ReactQueryProvider.tsx
+│   │   ├── ReduxProvider.tsx
+│   │   ├── ApolloProvider.tsx
+│   │   └── ThemeProvider.tsx
+│   ├── hooks/              # Custom hooks
+│   │   ├── useAuth.ts      # Authentication hook
+│   │   ├── useTransfers.ts # Transfer operations hook
+│   │   └── ...
+│   ├── store/              # Redux store configuration
+│   │   ├── index.ts        # Store setup
+│   │   ├── hooks.ts        # Typed hooks
+│   │   └── slices/         # Redux slices
+│   │       ├── authSlice.ts
+│   │       └── transferSlice.ts
+│   ├── services/           # API services and clients
+│   │   ├── api/
+│   │   │   ├── restClient.ts    # REST API client
+│   │   │   ├── graphqlClient.ts # GraphQL client
+│   │   │   └── mocks/           # MSW mock handlers
+│   │   ├── authService.ts
+│   │   └── transferService.ts
+│   ├── constants/          # Application constants
+│   │   ├── index.ts        # General constants
+│   │   ├── endpoints.ts    # API endpoints
+│   │   └── graphqlDocuments.ts
+│   ├── types/              # TypeScript type definitions
+│   │   ├── auth.ts
+│   │   ├── transfer.ts
+│   │   └── api.ts
+│   ├── lib/                # Utility functions
+│   │   └── utils.ts        # shadcn/ui utilities
+│   └── styles/             # Global styles
+│       └── globals.css
+├── vite.config.ts          # Vite configuration
+├── tailwind.config.ts      # Tailwind CSS configuration
+├── tsconfig.json           # TypeScript configuration
+└── package.json            # Project dependencies and scripts
 ```
 
-## Getting Started
+## 🚦 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm (or yarn/pnpm)
+
+### Installation & Setup
+
 1. **Install dependencies**
    ```bash
    npm install
    ```
-2. **Start the development server**
+
+2. **Environment configuration** (optional)
+   Create a `.env` file in the root directory:
+   ```bash
+   # API Configuration
+   VITE_API_BASE_URL=http://localhost:3001/api
+   VITE_GRAPHQL_URL=http://localhost:3001/graphql
+   
+   # Mock Service Worker
+   VITE_ENABLE_API_MOCKS=true
+   ```
+
+3. **Start development server**
    ```bash
    npm run dev
    ```
-   - Opens the app with hot module reloading.
-   - [MSW](https://mswjs.io/) mocks are automatically registered (see `src/services/api/mocks`). Set `VITE_ENABLE_API_MOCKS=false` in a `.env` file to disable mocks and forward requests to a live backend.
-   - Configure REST and GraphQL endpoints with `VITE_API_BASE_URL` (REST) and `VITE_GRAPHQL_URL` (GraphQL). When `VITE_GRAPHQL_URL` is omitted, the client falls back to `/graphql` or derives an absolute URL from `VITE_API_BASE_URL` when it points to a remote host.
-3. **Build for production**
+   - Opens at `http://localhost:5173` with hot module reloading
+   - MSW mocks are enabled by default for development
+   - React Query Devtools available in development mode
+
+4. **Build for production**
    ```bash
    npm run build
    ```
-4. **Preview the production build**
+
+5. **Preview production build**
    ```bash
    npm run preview
    ```
 
-## Quality & Tooling
-- **Linting:** `npm run lint`
-- **Type checking:** TypeScript runs during build; enable your editor's TS/ESLint integrations for the best DX.
-- **React Query Devtools:** Enabled in development via `AppProviders` for inspecting cached queries/mutations.
+## 📋 Available Scripts
 
-## Data Layer & API Mocking
-- REST requests are centralized in `src/services/api/restClient.ts` and GraphQL in `src/services/api/graphqlClient.ts`.
-- Domain services (e.g., `transferService`, `authService`) expose typed methods used by Redux thunks and React Query hooks.
-- During local development, MSW (`src/services/api/mocks`) intercepts network calls, returning mock auth, transfer, recipient, and exchange-rate data so the UI functions without a live backend.
-- Swap out or extend mocks when integrating real APIs. Configure `VITE_API_BASE_URL` to point to your backend and set `VITE_ENABLE_API_MOCKS=false` to bypass the mock service worker.
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server with hot reload |
+| `npm run build` | Build for production |
+| `npm run build:dev` | Build with development mode |
+| `npm run preview` | Preview production build locally |
+| `npm run lint` | Run ESLint for code linting |
 
-## Customization Tips
-- Update supported currencies in `src/constants/index.ts`.
-- Extend Redux slices or add new ones under `src/store/slices` for additional domains (e.g., beneficiaries, transaction history).
-- Reuse shadcn/ui primitives from `src/components/ui` to keep styling consistent.
-- Theme settings (default theme, system preference) are configured in `AppProviders` via `next-themes`.
+## 🎨 UI Components
 
-## License
-This project is provided as-is for demonstration purposes. Integrate with your organization's licensing requirements as needed.
+This project uses [shadcn/ui](https://ui.shadcn.com/) components built on top of Radix UI primitives:
+
+- **Layout**: Cards, Separators, Aspect Ratio
+- **Navigation**: Dropdown Menu, Navigation Menu, Tabs
+- **Inputs**: Form controls, Select, Checkbox, Radio Group
+- **Feedback**: Alerts, Toast, Progress, Tooltips
+- **Overlays**: Dialog, Popover, Hover Card
+- **Data Display**: Avatar, Badge, Table
+
+All components are fully customizable and follow consistent design patterns.
+
+## 🔧 State Management Architecture
+
+### Global State (Redux Toolkit)
+- **Auth Slice**: User authentication, session management
+- **Transfer Slice**: Transfer operations, form state
+- Centralized store with typed hooks (`useAppDispatch`, `useAppSelector`)
+
+### Server State (TanStack Query)
+- Automatic caching and background revalidation
+- Optimistic updates for better UX
+- Error handling and retry logic
+- Development tools for query inspection
+
+### Local State (React Hook Form + Zod)
+- Form validation with TypeScript-first schema validation
+- Optimized re-renders with controlled components
+- Built-in error handling and field validation
+
+## 🌐 API Integration
+
+### REST API Client
+- Centralized HTTP client with interceptors
+- Authentication token management
+- Error handling and retry logic
+- TypeScript interfaces for all endpoints
+
+### GraphQL Client (Apollo)
+- Optional GraphQL integration with Apollo Client
+- Automatic query caching and normalization
+- Real-time subscriptions support
+- Developer tools integration
+
+### Mock Service Worker (MSW)
+- Seamless API mocking for development
+- Realistic response simulation
+- Network-level request interception
+- Easy toggle between mocked and live APIs
+
+## 🎨 Theming & Styling
+
+### Tailwind CSS
+- Utility-first CSS framework
+- Responsive design patterns
+- Custom design system integration
+
+### Dark/Light Mode
+- Automatic system preference detection
+- Manual theme switching
+- Persistent theme selection
+- CSS variables for dynamic theming
+
+## 📦 Key Dependencies
+
+### Core Dependencies
+```json
+{
+  "react": "^18.3.1",
+  "react-dom": "^18.3.1",
+  "@reduxjs/toolkit": "^2.9.0",
+  "@tanstack/react-query": "^5.83.0",
+  "react-router-dom": "^6.30.1"
+}
+```
+
+### UI & Styling
+```json
+{
+  "tailwindcss": "^3.4.17",
+  "@radix-ui/react-*": "^1.x.x",
+  "lucide-react": "^0.462.0",
+  "next-themes": "^0.3.0"
+}
+```
+
+### Development Tools
+```json
+{
+  "vite": "^5.4.19",
+  "typescript": "^5.8.3",
+  "eslint": "^9.32.0",
+  "msw": "^2.11.3"
+}
+```
+
+## 🔧 Configuration Files
+
+### Vite Configuration
+- React plugin with SWC for fast refresh
+- Path aliases (@/ for src/)
+- Development server configuration
+
+### TypeScript Configuration
+- Strict mode enabled
+- Path mapping for clean imports
+- Modern target (ES2020)
+
+### Tailwind Configuration
+- Custom color scheme
+- shadcn/ui integration
+- Animation utilities
+
+## 🚀 Deployment
+
+This application can be deployed to any static hosting service:
+
+1. **Build the project**
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy the `dist` folder** to your hosting provider:
+   - Vercel
+   - Netlify
+   - AWS S3 + CloudFront
+   - GitHub Pages
+
+### Environment Variables
+Make sure to configure environment variables in your deployment platform:
+- `VITE_API_BASE_URL`: Your production API URL
+- `VITE_GRAPHQL_URL`: Your GraphQL endpoint
+- `VITE_ENABLE_API_MOCKS`: Set to `false` in production
+
+## 🤝 Development Workflow
+
+### Adding New Features
+1. Create feature components in `src/components/`
+2. Add necessary types in `src/types/`
+3. Implement API services in `src/services/`
+4. Create Redux slices if global state is needed
+5. Add React Query hooks for server state management
+
+### Code Quality
+- ESLint enforces coding standards
+- TypeScript ensures type safety
+- Consistent import organization
+- Component composition patterns
+
+## 📄 License
+
+This project is provided as-is for demonstration and educational purposes. Please review and comply with individual package licenses and your organization's requirements before production use.
+
+---
