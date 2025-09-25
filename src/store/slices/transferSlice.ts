@@ -2,6 +2,18 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { TransferState, Transfer, TransferRequest, ExchangeRate } from '@/types';
 import { transferService } from '@/services/transferService';
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return fallback;
+};
+
 const initialState: TransferState = {
   transfers: [],
   currentTransfer: null,
@@ -17,9 +29,12 @@ export const fetchTransfers = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await transferService.getTransfers();
+      if (!response.success) {
+        throw new Error(response.message || 'Unable to load transfers');
+      }
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to load transfers'));
     }
   }
 );
@@ -29,9 +44,12 @@ export const createTransfer = createAsyncThunk(
   async (transferData: TransferRequest, { rejectWithValue }) => {
     try {
       const response = await transferService.createTransfer(transferData);
+      if (!response.success) {
+        throw new Error(response.message || 'Unable to create transfer');
+      }
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to create transfer'));
     }
   }
 );
@@ -41,9 +59,12 @@ export const fetchExchangeRate = createAsyncThunk(
   async ({ from, to }: { from: string; to: string }, { rejectWithValue }) => {
     try {
       const response = await transferService.getExchangeRate(from, to);
+      if (!response.success) {
+        throw new Error(response.message || 'Unable to fetch exchange rate');
+      }
       return { key: `${from}-${to}`, rate: response.data };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to fetch exchange rate'));
     }
   }
 );
@@ -53,9 +74,12 @@ export const fetchRecipients = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await transferService.getRecipients();
+      if (!response.success) {
+        throw new Error(response.message || 'Unable to load recipients');
+      }
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to load recipients'));
     }
   }
 );

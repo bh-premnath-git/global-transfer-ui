@@ -9,15 +9,30 @@ const initialState: AuthState = {
   error: null,
 };
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return fallback;
+};
+
 // Async thunks
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
       const response = await authService.login(credentials);
+      if (!response.success) {
+        throw new Error(response.message || 'Login failed');
+      }
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to log in'));
     }
   }
 );
@@ -27,9 +42,12 @@ export const registerUser = createAsyncThunk(
   async (credentials: RegisterCredentials, { rejectWithValue }) => {
     try {
       const response = await authService.register(credentials);
+      if (!response.success) {
+        throw new Error(response.message || 'Registration failed');
+      }
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to register'));
     }
   }
 );
@@ -38,9 +56,12 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await authService.logout();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+      const response = await authService.logout();
+      if (!response.success) {
+        throw new Error(response.message || 'Logout failed');
+      }
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to logout'));
     }
   }
 );
@@ -50,9 +71,12 @@ export const getCurrentUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await authService.getCurrentUser();
+      if (!response.success) {
+        throw new Error(response.message || 'Unable to fetch user');
+      }
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Unable to fetch user'));
     }
   }
 );
@@ -119,6 +143,9 @@ const authSlice = createSlice({
       .addCase(getCurrentUser.rejected, (state) => {
         state.loading = false;
         state.isAuthenticated = false;
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth_token');
+        }
       });
   },
 });
