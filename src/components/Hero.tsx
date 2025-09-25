@@ -5,21 +5,21 @@ import { useEffect, useRef, useState } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import type { EmblaCarouselType } from "embla-carousel";
 import heroImage from "@/assets/hero-bg.jpg";
-import { useNavigate } from "react-router-dom";
+import { useAuthDialog } from "@/providers/AuthDialogProvider";
 
 const promotionalOffers = [
   {
     icon: Star,
     title: "New User get exciting rates on your first three transfers",
     description: "New users only",
-    color: "text-yellow-500"
+    color: "text-yellow-500",
   },
   {
     icon: Zap,
     title: "A referral can get you 0 fees for your next 2 transactions",
     description: "referral only",
-    color: "text-blue-500"
-  }
+    color: "text-blue-500",
+  },
 ];
 
 export const Hero = () => {
@@ -28,7 +28,7 @@ export const Hero = () => {
   const autoplayRef = useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
   );
-  const navigate = useNavigate();
+  const { openAuth } = useAuthDialog();
 
   useEffect(() => {
     if (!api) return;
@@ -110,7 +110,7 @@ export const Hero = () => {
               size="default"
               variant="gradient"
               className="h-10 rounded-full px-6 text-sm font-medium shadow-lg shadow-primary/30"
-              onClick={() => navigate({ pathname: "/auth", search: "?mode=login" })}
+              onClick={() => openAuth("login")}
             >
               Start transfer
               <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
