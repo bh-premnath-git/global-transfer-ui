@@ -5,9 +5,11 @@ import App from './App.tsx';
 import { AppProviders } from './providers/AppProviders';
 import './index.css';
 
-// Start MSW in development when enabled
+// Start MSW when explicitly enabled or by default in development
+const enableMocksFlag = import.meta.env.VITE_ENABLE_API_MOCKS;
 const shouldEnableMocks =
-  import.meta.env.DEV && import.meta.env.VITE_ENABLE_API_MOCKS !== 'false';
+  enableMocksFlag === 'true' ||
+  (import.meta.env.DEV && enableMocksFlag !== 'false');
 
 if (shouldEnableMocks) {
   // Clear problematic cookies that might cause MSW serialization issues

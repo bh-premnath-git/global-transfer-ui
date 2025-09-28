@@ -134,6 +134,8 @@ A modern, full-stack financial transfer application built with React, TypeScript
    ```bash
    npm run preview
    ```
+   - To keep payment simulation mocks when previewing, run `VITE_ENABLE_API_MOCKS=true npm run preview`
+   - When serving the production bundle with another tool, set `VITE_ENABLE_API_MOCKS=true` in the environment so MSW continues to power simulated payments
 
 ## 📋 Available Scripts
 
