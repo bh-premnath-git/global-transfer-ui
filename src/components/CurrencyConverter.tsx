@@ -1,5 +1,5 @@
 import { FormEvent, useMemo, useState } from "react";
-import { ArrowUpDown, Calculator, CheckCircle, Loader2, UserRound, CreditCard, Building2, Banknote, Shield, Clock, ArrowRight, X } from "lucide-react";
+import { ArrowUpDown, Calculator, CheckCircle, Loader2, UserRound, CreditCard, Building2, Banknote, Shield, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -341,18 +341,10 @@ export const CurrencyConverter = () => {
       >
         <DialogContent className="max-w-md">
           <DialogHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center gap-2 text-base">
-                <UserRound className="h-4 w-4 text-primary" />
-                Send {toCurrency} {receiveAmount}
-              </DialogTitle>
-              <DialogClose
-                className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-opacity hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </DialogClose>
-            </div>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <UserRound className="h-4 w-4 text-primary" />
+              Send {toCurrency} {receiveAmount}
+            </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Choose delivery method and enter recipient details
             </DialogDescription>
