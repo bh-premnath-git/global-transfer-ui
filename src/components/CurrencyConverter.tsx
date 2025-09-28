@@ -52,7 +52,15 @@ export const CurrencyConverter = () => {
   const { toast } = useToast();
 
   const { data: exchangeRateData, isLoading: isLoadingRate } = useExchangeRate(fromCurrency, toCurrency);
-  const exchangeRate = exchangeRateData?.rate?.rate ?? 0.85;
+  const isSameCurrency = fromCurrency === toCurrency;
+  const exchangeRate = useMemo(() => {
+    if (isSameCurrency) {
+      return 1;
+    }
+
+    return exchangeRateData?.rate?.rate ?? 0.85;
+  }, [exchangeRateData, isSameCurrency]);
+  const isRateLoading = !isSameCurrency && isLoadingRate;
 
   const numSendAmount = parseFloat(sendAmount) || 0;
   const receiveAmount = useMemo(() => (numSendAmount * exchangeRate).toFixed(2), [numSendAmount, exchangeRate]);
@@ -306,7 +314,7 @@ export const CurrencyConverter = () => {
                   <div className="flex gap-2">
                     <Input
                       type="text"
-                      value={isLoadingRate ? "Loading..." : receiveAmount}
+                      value={isRateLoading ? "Loading..." : receiveAmount}
                       readOnly
                       className="flex-1 h-8 px-3 bg-white/20 backdrop-blur border-white/30 text-white"
                     />
@@ -334,7 +342,7 @@ export const CurrencyConverter = () => {
               <div className="grid grid-cols-3 gap-2 text-xs mb-3">
                 <div className="text-center">
                   <div className="text-muted-foreground">Rate</div>
-                  <div className="font-medium">{isLoadingRate ? "..." : exchangeRate}</div>
+                  <div className="font-medium">{isRateLoading ? "..." : exchangeRate}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-muted-foreground">Fee</div>
