@@ -16,12 +16,27 @@ const statusVariant = {
   failed: "destructive" as const,
 };
 
-const formatCurrency = (value: number, currency: string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(value);
+const formatCurrency = (value: number, currency?: string) => {
+  if (!currency) {
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(value);
+  } catch (error) {
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+};
 
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -111,10 +126,12 @@ const Transactions = () => {
                       <div className="text-xs text-muted-foreground">{transfer.recipientDetails?.email}</div>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {formatCurrency(transfer.sendAmount, transfer.fromCurrency)} {transfer.fromCurrency}
+                      {formatCurrency(transfer.sendAmount, transfer.fromCurrency)}
+                      {transfer.fromCurrency ? ` ${transfer.fromCurrency}` : ""}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {formatCurrency(transfer.receiveAmount, transfer.toCurrency)} {transfer.toCurrency}
+                      {formatCurrency(transfer.receiveAmount, transfer.toCurrency)}
+                      {transfer.toCurrency ? ` ${transfer.toCurrency}` : ""}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       <Badge variant="outline" className="capitalize">

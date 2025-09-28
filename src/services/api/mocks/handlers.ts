@@ -333,6 +333,8 @@ export const handlers = [
         createTransfer: {
           id: Date.now().toString(),
           status: 'pending',
+          fromCurrency: input.fromCurrency,
+          toCurrency: input.toCurrency,
           sendAmount: input.sendAmount,
           receiveAmount: input.sendAmount * 0.85,
           exchangeRate: 0.85,
