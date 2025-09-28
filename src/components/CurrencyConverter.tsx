@@ -11,7 +11,7 @@ import { useTransfers } from "@/hooks/useTransfers";
 import { CURRENCIES, FEE_RATES } from "@/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccount } from "@/hooks/useAccount";
-import { DeliveryMethod } from "@/types";
+import { DeliveryMethod, TransferRecipient } from "@/types";
 
 const processingSteps = [
   "Validating transfer details",
@@ -105,7 +105,43 @@ export const CurrencyConverter = () => {
     setTransferError(null);
     setIsProcessing(true);
 
+    const buildRecipientDetails = (): TransferRecipient => {
+      const base = {
+        name: recipient.name.trim(),
+        email: recipient.email.trim(),
+        country: recipient.country.trim(),
+      };
+
+      switch (transferMethod) {
+        case 'bank':
+          return {
+            method: 'bank',
+            ...base,
+            accountNumber: recipient.accountNumber.trim(),
+            ...(recipient.bankName.trim() ? { bankName: recipient.bankName.trim() } : {}),
+          };
+        case 'card':
+          return {
+            method: 'card',
+            ...base,
+            cardNumber: recipient.cardNumber.trim(),
+            expiryDate: recipient.expiryDate.trim(),
+            cvv: recipient.cvv.trim(),
+          };
+        case 'cash':
+          return {
+            method: 'cash',
+            ...base,
+            pickupLocation: recipient.pickupLocation.trim(),
+            idNumber: recipient.idNumber.trim(),
+          };
+        default:
+          throw new Error(`Unsupported delivery method: ${transferMethod}`);
+      }
+    };
+
     const recipientId = `rec-${Date.now()}`;
+    const payloadRecipientDetails = buildRecipientDetails();
 
     createTransfer(
       {
@@ -113,7 +149,7 @@ export const CurrencyConverter = () => {
         toCurrency,
         sendAmount: numSendAmount,
         recipientId,
-        recipientDetails: recipient,
+        recipientDetails: payloadRecipientDetails,
         deliveryMethod: transferMethod,
       },
       {

@@ -110,7 +110,7 @@ const transferSlice = createSlice({
       })
       .addCase(fetchTransfers.fulfilled, (state, action) => {
         state.loading = false;
-        state.transfers = action.payload;
+        state.transfers = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchTransfers.rejected, (state, action) => {
         state.loading = false;
@@ -123,6 +123,9 @@ const transferSlice = createSlice({
       })
       .addCase(createTransfer.fulfilled, (state, action) => {
         state.loading = false;
+        if (!Array.isArray(state.transfers)) {
+          state.transfers = [];
+        }
         state.transfers.unshift(action.payload);
         state.currentTransfer = action.payload;
       })
