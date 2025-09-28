@@ -96,6 +96,7 @@
     --accent-foreground: 222 20% 10%;
     --border: 220 15% 25%;
     --input: 220 15% 20%;
+    --gradient-bg: linear-gradient(180deg, hsl(222 20% 12%), hsl(222 20% 8%));
   }
 }
 
