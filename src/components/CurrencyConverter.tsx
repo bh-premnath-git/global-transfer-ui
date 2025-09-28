@@ -157,22 +157,22 @@ export const CurrencyConverter = () => {
   if (isProcessing) {
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4">
+        <div className="bg-card dark:bg-card/90 rounded-2xl p-6 max-w-sm w-full mx-4">
           <div className="text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <Shield className="h-6 w-6 text-blue-600" />
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20">
+              <Shield className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold mb-1">Sending money</h3>
-            <p className="text-sm text-gray-500 mb-4">Processing securely</p>
+            <p className="text-sm text-muted-foreground mb-4">Processing securely</p>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-3 mb-4">
+          <div className="bg-muted rounded-lg p-3 mb-4 dark:bg-muted/60">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">{fromCurrency} ${sendAmount}</span>
-              <ArrowRight className="h-4 w-4 text-gray-400" />
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
               <span className="font-medium">{toCurrency} {receiveAmount}</span>
             </div>
-            <div className="text-xs text-gray-500 text-center mt-1">
+            <div className="text-xs text-muted-foreground text-center mt-1">
               {recipient.name} • {transferMethods.find(m => m.id === transferMethod)?.label}
             </div>
           </div>
@@ -181,23 +181,23 @@ export const CurrencyConverter = () => {
             {processingSteps.map((step, index) => (
               <div key={step} className="flex items-center gap-3">
                 {index < currentStep ? (
-                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
                 ) : index === currentStep ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-blue-600 flex-shrink-0" />
+                  <Loader2 className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
                 ) : (
-                  <div className="h-4 w-4 rounded-full border-2 border-gray-200 flex-shrink-0" />
+                  <div className="h-4 w-4 rounded-full border-2 border-border flex-shrink-0" />
                 )}
-                <span className={`text-sm ${index <= currentStep ? 'text-gray-900' : 'text-gray-400'}`}>
+                <span className={`text-sm ${index <= currentStep ? 'text-foreground' : 'text-muted-foreground'}`}>
                   {step}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 flex items-center gap-2 bg-blue-50 rounded-lg p-2 text-xs text-blue-700">
-            <Clock className="h-3 w-3" />
+          <div className="mt-4 flex items-center gap-2 bg-muted rounded-lg p-2 text-xs text-foreground dark:bg-muted/60">
+            <Clock className="h-3 w-3 text-primary" />
             <span>
-              {transferMethod === "card" ? "Instant" : 
+              {transferMethod === "card" ? "Instant" :
                transferMethod === "cash" ? "30 minutes" : "1-2 days"}
             </span>
           </div>
@@ -372,8 +372,8 @@ export const CurrencyConverter = () => {
                       onClick={() => setTransferMethod(method.id)}
                       className={`p-2 rounded-lg border text-center transition-all ${
                         transferMethod === method.id
-                          ? 'border-blue-500 bg-blue-50 text-blue-600'
-                          : 'border-border hover:border-gray-300'
+                          ? 'border-primary bg-muted text-foreground dark:bg-muted/60'
+                          : 'border-border hover:border-primary/40 dark:hover:border-primary/60'
                       }`}
                     >
                       <Icon className="h-4 w-4 mx-auto mb-1" />
@@ -472,7 +472,7 @@ export const CurrencyConverter = () => {
               )}
 
               {transferError && (
-                <p className="text-xs text-destructive bg-red-50 p-2 rounded">{transferError}</p>
+                <p className="text-xs text-destructive bg-destructive/10 dark:bg-destructive/20 p-2 rounded">{transferError}</p>
               )}
 
               {/* Summary */}
@@ -483,8 +483,8 @@ export const CurrencyConverter = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>They get:</span>
-                  <span className="font-semibold text-green-600">{toCurrency} {receiveAmount}</span>
-                </div>
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">{toCurrency} {receiveAmount}</span>
+              </div>
               </div>
 
               <Button 
