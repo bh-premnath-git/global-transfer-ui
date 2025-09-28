@@ -48,6 +48,7 @@ const mockTransfers: Transfer[] = [
     status: 'completed',
     recipientId: '1',
     recipientDetails: {
+      method: 'bank',
       name: 'Jane Smith',
       email: 'jane@example.com',
       accountNumber: 'DE89370400440532013000',
@@ -70,6 +71,7 @@ const mockTransfers: Transfer[] = [
     status: 'completed',
     recipientId: '2',
     recipientDetails: {
+      method: 'bank',
       name: 'Marco Rossi',
       email: 'marco@example.it',
       accountNumber: 'IT60X0542811101000000123456',
@@ -92,11 +94,12 @@ const mockTransfers: Transfer[] = [
     status: 'pending',
     recipientId: '3',
     recipientDetails: {
+      method: 'cash',
       name: 'Aisha Khan',
       email: 'aisha@example.in',
-      accountNumber: 'IN0987654321123456',
       country: 'India',
-      bankName: 'HDFC Bank',
+      pickupLocation: 'HDFC Bank Mumbai Central',
+      idNumber: 'ID99887766',
     },
     deliveryMethod: 'cash',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),

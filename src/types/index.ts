@@ -106,13 +106,36 @@ export interface LedgerEntry {
   createdAt: string;
 }
 
-export interface TransferRecipient {
+interface RecipientBase {
+  method: DeliveryMethod;
   name: string;
   email: string;
-  accountNumber: string;
   country: string;
+}
+
+export interface BankRecipientDetails extends RecipientBase {
+  method: 'bank';
+  accountNumber: string;
   bankName?: string;
 }
+
+export interface CardRecipientDetails extends RecipientBase {
+  method: 'card';
+  cardNumber: string;
+  expiryDate: string;
+  cvv: string;
+}
+
+export interface CashRecipientDetails extends RecipientBase {
+  method: 'cash';
+  pickupLocation: string;
+  idNumber: string;
+}
+
+export type TransferRecipient =
+  | BankRecipientDetails
+  | CardRecipientDetails
+  | CashRecipientDetails;
 
 export interface AccountState {
   wallet: WalletSummary | null;

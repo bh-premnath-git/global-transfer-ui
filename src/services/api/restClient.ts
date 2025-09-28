@@ -2,15 +2,38 @@ import { ApiResponse } from '@/types';
 
 const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
+const isAbsoluteURL = (value: string) => /^https?:\/\//i.test(value);
+
+const normalizeBaseURL = (baseURL: string) => {
+  if (!baseURL) {
+    return '';
+  }
+
+  const trimmed = baseURL.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  return trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
+};
+
+const normalizeEndpoint = (endpoint: string) => {
+  if (!endpoint) {
+    return '';
+  }
+
+  return endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+};
+
 class RestClient {
   private baseURL: string;
 
   constructor(baseURL: string = DEFAULT_BASE_URL) {
-    this.baseURL = baseURL;
+    this.baseURL = normalizeBaseURL(baseURL) || '';
   }
 
   setBaseURL(baseURL: string) {
-    this.baseURL = baseURL;
+    this.baseURL = normalizeBaseURL(baseURL) || '';
   }
 
   getBaseURL() {
@@ -58,7 +81,9 @@ class RestClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = endpoint.startsWith('http') ? endpoint : `${this.baseURL}${endpoint}`;
+    const url = isAbsoluteURL(endpoint)
+      ? endpoint
+      : `${normalizeBaseURL(this.baseURL)}${normalizeEndpoint(endpoint)}`;
 
     const config: RequestInit = {
       headers: {
