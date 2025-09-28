@@ -54,6 +54,7 @@ const mockTransfers: Transfer[] = [
       country: 'Germany',
       bankName: 'Deutsche Bank',
     },
+    deliveryMethod: 'bank',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -75,6 +76,7 @@ const mockTransfers: Transfer[] = [
       country: 'Italy',
       bankName: 'Intesa Sanpaolo',
     },
+    deliveryMethod: 'bank',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
   },
@@ -96,6 +98,7 @@ const mockTransfers: Transfer[] = [
       country: 'India',
       bankName: 'HDFC Bank',
     },
+    deliveryMethod: 'cash',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
   },
@@ -324,7 +327,7 @@ export const handlers = [
 
   graphql.mutation('CreateTransfer', ({ variables }: { variables: { input: TransferRequest } }) => {
     const { input } = variables;
-    
+
     return HttpResponse.json({
       data: {
         createTransfer: {
@@ -334,6 +337,7 @@ export const handlers = [
           receiveAmount: input.sendAmount * 0.85,
           exchangeRate: 0.85,
           fee: input.sendAmount * 0.005,
+          deliveryMethod: input.deliveryMethod,
         },
       },
     });

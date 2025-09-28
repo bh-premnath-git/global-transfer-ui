@@ -33,6 +33,8 @@ export interface Currency {
 }
 
 // Transfer types
+export type DeliveryMethod = 'bank' | 'card' | 'cash';
+
 export interface Transfer {
   id: string;
   fromCurrency: string;
@@ -45,6 +47,7 @@ export interface Transfer {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   recipientId: string;
   recipientDetails?: TransferRecipient;
+  deliveryMethod: DeliveryMethod;
   createdAt: string;
   updatedAt: string;
 }
@@ -55,6 +58,7 @@ export interface TransferRequest {
   sendAmount: number;
   recipientId: string;
   recipientDetails?: TransferRecipient;
+  deliveryMethod: DeliveryMethod;
 }
 
 export interface ExchangeRate {

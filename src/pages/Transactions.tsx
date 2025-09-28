@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTransfers } from "@/hooks/useTransfers";
 import { useAccount } from "@/hooks/useAccount";
+import { DeliveryMethod } from "@/types";
 
 const statusVariant = {
   completed: "secondary" as const,
@@ -29,6 +30,12 @@ const formatDate = (value: string) =>
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
+
+const deliveryMethodLabels: Record<DeliveryMethod, string> = {
+  bank: "Bank transfer",
+  card: "Card payout",
+  cash: "Cash pickup",
+};
 
 const Transactions = () => {
   const { transfers, isLoading } = useTransfers();
@@ -83,6 +90,7 @@ const Transactions = () => {
                 <TableHead>Recipient</TableHead>
                 <TableHead>From</TableHead>
                 <TableHead>To</TableHead>
+                <TableHead>Method</TableHead>
                 <TableHead className="text-right">Total</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -90,7 +98,7 @@ const Transactions = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={7} className="h-24 text-center text-sm text-muted-foreground">
                     Loading transfers...
                   </TableCell>
                 </TableRow>
@@ -108,6 +116,11 @@ const Transactions = () => {
                     <TableCell className="text-xs text-muted-foreground">
                       {formatCurrency(transfer.receiveAmount, transfer.toCurrency)} {transfer.toCurrency}
                     </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      <Badge variant="outline" className="capitalize">
+                        {deliveryMethodLabels[transfer.deliveryMethod] ?? transfer.deliveryMethod}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-right text-sm font-semibold">
                       {formatCurrency(transfer.totalAmount, transfer.fromCurrency)}
                     </TableCell>
@@ -120,7 +133,7 @@ const Transactions = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={7} className="h-24 text-center text-sm text-muted-foreground">
                     No transfers yet. Send your first transfer from the dashboard.
                   </TableCell>
                 </TableRow>

@@ -11,6 +11,7 @@ import { useTransfers } from "@/hooks/useTransfers";
 import { CURRENCIES, FEE_RATES } from "@/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccount } from "@/hooks/useAccount";
+import { DeliveryMethod } from "@/types";
 
 const processingSteps = [
   "Validating transfer details",
@@ -43,7 +44,7 @@ export const CurrencyConverter = () => {
   const [currentStep, setCurrentStep] = useState(-1);
   const [recipient, setRecipient] = useState<RecipientFormState>(recipientDefaults);
   const [transferError, setTransferError] = useState<string | null>(null);
-  const [transferMethod, setTransferMethod] = useState("bank");
+  const [transferMethod, setTransferMethod] = useState<DeliveryMethod>("bank");
 
   const { useExchangeRate, createTransfer, updateStatus, refetchTransfers } = useTransfers();
   const { isAuthenticated } = useAuth();
@@ -113,6 +114,7 @@ export const CurrencyConverter = () => {
         sendAmount: numSendAmount,
         recipientId,
         recipientDetails: recipient,
+        deliveryMethod: transferMethod,
       },
       {
         onSuccess: (transfer) => {
@@ -147,7 +149,7 @@ export const CurrencyConverter = () => {
     );
   };
 
-  const transferMethods = [
+  const transferMethods: Array<{ id: DeliveryMethod; label: string; icon: typeof Building2; desc: string; fee: string }> = [
     { id: "bank", label: "Bank", icon: Building2, desc: "1-2 days", fee: fee },
     { id: "card", label: "Card", icon: CreditCard, desc: "Instant", fee: (parseFloat(fee) + 2).toFixed(2) },
     { id: "cash", label: "Cash", icon: Banknote, desc: "30 mins", fee: fee }
