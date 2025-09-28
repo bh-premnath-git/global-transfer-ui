@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useTransfers } from "@/hooks/useTransfers";
@@ -346,14 +346,12 @@ export const CurrencyConverter = () => {
                 <UserRound className="h-4 w-4 text-primary" />
                 Send {toCurrency} {receiveAmount}
               </DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsDialogOpen(false)}
-                className="h-6 w-6 p-0"
+              <DialogClose
+                className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-opacity hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 <X className="h-4 w-4" />
-              </Button>
+                <span className="sr-only">Close</span>
+              </DialogClose>
             </div>
             <DialogDescription className="text-xs text-muted-foreground">
               Choose delivery method and enter recipient details
