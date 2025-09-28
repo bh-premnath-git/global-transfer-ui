@@ -1,6 +1,6 @@
 import { http, HttpResponse, graphql } from 'msw';
 import { API_ENDPOINTS } from '@/constants';
-import { Transfer, User, ExchangeRate, Recipient, WalletSummary, LedgerEntry, TransferRequest } from '@/types';
+import { Transfer, User, ExchangeRate, Recipient, WalletSummary, LedgerEntry, TransferRequest, TransferMethod } from '@/types';
 
 const resolveEndpoint = (endpoint: string) => {
   if (endpoint.startsWith('http')) {
@@ -46,6 +46,7 @@ const mockTransfers: Transfer[] = [
     fee: 5,
     totalAmount: 1005,
     status: 'completed',
+    transferMethod: 'bank',
     recipientId: '1',
     recipientDetails: {
       name: 'Jane Smith',
@@ -67,6 +68,7 @@ const mockTransfers: Transfer[] = [
     fee: 2.5,
     totalAmount: 502.5,
     status: 'completed',
+    transferMethod: 'bank',
     recipientId: '2',
     recipientDetails: {
       name: 'Marco Rossi',
@@ -88,6 +90,7 @@ const mockTransfers: Transfer[] = [
     fee: 1.25,
     totalAmount: 251.25,
     status: 'pending',
+    transferMethod: 'cash',
     recipientId: '3',
     recipientDetails: {
       name: 'Aisha Khan',
@@ -100,6 +103,12 @@ const mockTransfers: Transfer[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
   },
 ];
+
+const transferMethodLabels: Record<TransferMethod, string> = {
+  bank: 'Bank',
+  card: 'Card',
+  cash: 'Cash',
+};
 
 let mockLedger: LedgerEntry[] = [
   {
@@ -242,14 +251,25 @@ export const handlers = [
   http.post(resolveEndpoint(API_ENDPOINTS.TRANSFERS.CREATE), async ({ request }) => {
     const body = await request.json() as TransferRequest;
 
+    const baseFee = Number((body.sendAmount * 0.005).toFixed(2));
+    const surcharge = body.transferMethod === 'card' ? 2 : 0;
+    const fee = Number((baseFee + surcharge).toFixed(2));
+    const receiveAmount = Number((body.sendAmount * 0.85).toFixed(2));
+    const totalAmount = Number((body.sendAmount + fee).toFixed(2));
+
     const newTransfer: Transfer = {
       id: Date.now().toString(),
-      ...body,
-      receiveAmount: body.sendAmount * 0.85,
+      fromCurrency: body.fromCurrency,
+      toCurrency: body.toCurrency,
+      sendAmount: body.sendAmount,
+      receiveAmount,
       exchangeRate: 0.85,
-      fee: body.sendAmount * 0.005,
-      totalAmount: body.sendAmount + (body.sendAmount * 0.005),
+      fee,
+      totalAmount,
       status: 'processing',
+      transferMethod: body.transferMethod,
+      recipientId: body.recipientId,
+      recipientDetails: body.recipientDetails,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -259,7 +279,8 @@ export const handlers = [
     const debitAmount = newTransfer.totalAmount;
     mockWallet.balance = Number((mockWallet.balance - debitAmount).toFixed(2));
     mockWallet.ledgerBalance = Number((mockWallet.ledgerBalance - debitAmount).toFixed(2));
-    mockWallet.pending = Number((mockWallet.pending + newTransfer.totalAmount * 0.1).toFixed(2));
+    const pendingDelta = newTransfer.transferMethod === 'card' ? 0 : Number((newTransfer.totalAmount * 0.1).toFixed(2));
+    mockWallet.pending = Number((mockWallet.pending + pendingDelta).toFixed(2));
     mockWallet.lastUpdated = new Date().toISOString();
 
     const ledgerEntry: LedgerEntry = {
@@ -267,7 +288,7 @@ export const handlers = [
       type: 'debit',
       amount: Number(debitAmount.toFixed(2)),
       currency: newTransfer.fromCurrency,
-      description: `Transfer to ${newTransfer.recipientDetails?.name ?? 'recipient'}`,
+      description: `Transfer to ${newTransfer.recipientDetails?.name ?? 'recipient'} via ${transferMethodLabels[newTransfer.transferMethod]}`,
       reference: `TRX-${newTransfer.id.slice(-6)}`,
       createdAt: new Date().toISOString(),
     };
@@ -324,16 +345,24 @@ export const handlers = [
 
   graphql.mutation('CreateTransfer', ({ variables }: { variables: { input: TransferRequest } }) => {
     const { input } = variables;
-    
+
+    const baseFee = Number((input.sendAmount * 0.005).toFixed(2));
+    const surcharge = input.transferMethod === 'card' ? 2 : 0;
+    const fee = Number((baseFee + surcharge).toFixed(2));
+    const totalAmount = Number((input.sendAmount + fee).toFixed(2));
+    const receiveAmount = Number((input.sendAmount * 0.85).toFixed(2));
+
     return HttpResponse.json({
       data: {
         createTransfer: {
           id: Date.now().toString(),
           status: 'pending',
           sendAmount: input.sendAmount,
-          receiveAmount: input.sendAmount * 0.85,
+          receiveAmount,
           exchangeRate: 0.85,
-          fee: input.sendAmount * 0.005,
+          fee,
+          totalAmount,
+          transferMethod: input.transferMethod,
         },
       },
     });

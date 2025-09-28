@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, MouseEvent, useMemo, useState } from "react";
 import { ArrowUpDown, Calculator, CheckCircle, Loader2, UserRound, CreditCard, Building2, Banknote, Shield, Clock, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { useTransfers } from "@/hooks/useTransfers";
 import { CURRENCIES, FEE_RATES } from "@/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccount } from "@/hooks/useAccount";
+import type { TransferMethod } from "@/types";
 
 const processingSteps = [
   "Validating transfer details",
@@ -43,7 +44,7 @@ export const CurrencyConverter = () => {
   const [currentStep, setCurrentStep] = useState(-1);
   const [recipient, setRecipient] = useState<RecipientFormState>(recipientDefaults);
   const [transferError, setTransferError] = useState<string | null>(null);
-  const [transferMethod, setTransferMethod] = useState("bank");
+  const [transferMethod, setTransferMethod] = useState<TransferMethod>("bank");
 
   const { useExchangeRate, createTransfer, updateStatus, refetchTransfers } = useTransfers();
   const { isAuthenticated } = useAuth();
@@ -55,8 +56,56 @@ export const CurrencyConverter = () => {
 
   const numSendAmount = parseFloat(sendAmount) || 0;
   const receiveAmount = useMemo(() => (numSendAmount * exchangeRate).toFixed(2), [numSendAmount, exchangeRate]);
-  const fee = useMemo(() => (numSendAmount * FEE_RATES.STANDARD).toFixed(2), [numSendAmount]);
-  const totalAmount = useMemo(() => (numSendAmount + parseFloat(fee)).toFixed(2), [numSendAmount, fee]);
+  const baseFeeValue = useMemo(
+    () => Number((numSendAmount * FEE_RATES.STANDARD).toFixed(2)),
+    [numSendAmount],
+  );
+
+  type TransferMethodOption = {
+    id: TransferMethod;
+    label: string;
+    icon: typeof Building2;
+    desc: string;
+    feeValue: number;
+  };
+
+  const transferMethodOptions = useMemo<TransferMethodOption[]>(() => [
+    {
+      id: "bank",
+      label: "Bank",
+      icon: Building2,
+      desc: "1-2 days",
+      feeValue: baseFeeValue,
+    },
+    {
+      id: "card",
+      label: "Card",
+      icon: CreditCard,
+      desc: "Instant",
+      feeValue: Number((baseFeeValue + 2).toFixed(2)),
+    },
+    {
+      id: "cash",
+      label: "Cash",
+      icon: Banknote,
+      desc: "30 mins",
+      feeValue: baseFeeValue,
+    },
+  ], [baseFeeValue]);
+
+  const selectedMethod = useMemo(
+    () => transferMethodOptions.find((method) => method.id === transferMethod) ?? transferMethodOptions[0],
+    [transferMethodOptions, transferMethod],
+  );
+
+  const selectedFeeValue = selectedMethod?.feeValue ?? 0;
+  const selectedFee = selectedFeeValue.toFixed(2);
+  const selectedTotalValue = useMemo(
+    () => Number((numSendAmount + selectedFeeValue).toFixed(2)),
+    [numSendAmount, selectedFeeValue],
+  );
+  const selectedTotal = selectedTotalValue.toFixed(2);
+  const canSubmit = numSendAmount > 0 && selectedTotalValue > 0;
 
   const handleSwapCurrencies = () => {
     setFromCurrency(toCurrency);
@@ -79,9 +128,9 @@ export const CurrencyConverter = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (numSendAmount <= 0 || isProcessing) {
+  const handleSubmit = (event?: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    if (!canSubmit || isProcessing) {
       return;
     }
 
@@ -113,6 +162,9 @@ export const CurrencyConverter = () => {
         sendAmount: numSendAmount,
         recipientId,
         recipientDetails: recipient,
+        transferMethod,
+        fee: selectedFeeValue,
+        totalAmount: selectedTotalValue,
       },
       {
         onSuccess: (transfer) => {
@@ -129,7 +181,7 @@ export const CurrencyConverter = () => {
                 refetchLedger();
                 toast({
                   title: 'Transfer completed',
-                  description: `${recipient.name} will receive ${toCurrency} ${receiveAmount}.`,
+                  description: `${recipient.name} will receive ${toCurrency} ${receiveAmount}. Total charged: ${fromCurrency} ${selectedTotal} via ${selectedMethod?.label ?? 'selected method'}.`,
                 });
                 setTimeout(() => {
                   setIsDialogOpen(false);
@@ -147,12 +199,6 @@ export const CurrencyConverter = () => {
     );
   };
 
-  const transferMethods = [
-    { id: "bank", label: "Bank", icon: Building2, desc: "1-2 days", fee: fee },
-    { id: "card", label: "Card", icon: CreditCard, desc: "Instant", fee: (parseFloat(fee) + 2).toFixed(2) },
-    { id: "cash", label: "Cash", icon: Banknote, desc: "30 mins", fee: fee }
-  ];
-
   // Processing state overlay
   if (isProcessing) {
     return (
@@ -168,12 +214,12 @@ export const CurrencyConverter = () => {
 
           <div className="bg-muted rounded-lg p-3 mb-4 dark:bg-muted/60">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">{fromCurrency} ${sendAmount}</span>
+              <span className="font-medium">{fromCurrency} ${selectedTotal}</span>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
               <span className="font-medium">{toCurrency} {receiveAmount}</span>
             </div>
             <div className="text-xs text-muted-foreground text-center mt-1">
-              {recipient.name} • {transferMethods.find(m => m.id === transferMethod)?.label}
+              {recipient.name} • {selectedMethod?.label}
             </div>
           </div>
 
@@ -300,11 +346,11 @@ export const CurrencyConverter = () => {
                 </div>
                 <div className="text-center">
                   <div className="text-muted-foreground">Fee</div>
-                  <div className="font-medium">${fee}</div>
+                  <div className="font-medium">${selectedFee}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-muted-foreground">Total</div>
-                  <div className="font-medium">${totalAmount}</div>
+                  <div className="font-medium">${selectedTotal}</div>
                 </div>
               </div>
 
@@ -312,7 +358,7 @@ export const CurrencyConverter = () => {
                 variant="gradient"
                 className="w-full h-9"
                 onClick={handleStartTransfer}
-                disabled={!isAuthenticated || numSendAmount <= 0}
+                disabled={!isAuthenticated || !canSubmit}
               >
                 {isAuthenticated ? "Send money" : "Log in to start"}
               </Button>
@@ -363,7 +409,7 @@ export const CurrencyConverter = () => {
             <div>
               <Label className="text-xs font-medium mb-2 block">Delivery method</Label>
               <div className="grid grid-cols-3 gap-1">
-                {transferMethods.map((method) => {
+                {transferMethodOptions.map((method) => {
                   const Icon = method.icon;
                   return (
                     <button
@@ -379,7 +425,7 @@ export const CurrencyConverter = () => {
                       <Icon className="h-4 w-4 mx-auto mb-1" />
                       <div className="text-xs font-medium">{method.label}</div>
                       <div className="text-xs text-muted-foreground">{method.desc}</div>
-                      <div className="text-xs font-medium">${method.fee}</div>
+                      <div className="text-xs font-medium">${method.feeValue.toFixed(2)}</div>
                     </button>
                   );
                 })}
@@ -479,21 +525,19 @@ export const CurrencyConverter = () => {
               <div className="bg-muted rounded-lg p-2 text-xs">
                 <div className="flex justify-between">
                   <span>You pay:</span>
-                  <span className="font-semibold">{fromCurrency} ${totalAmount}</span>
+                  <span className="font-semibold">{fromCurrency} ${selectedTotal}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>They get:</span>
                   <span className="font-semibold text-emerald-600 dark:text-emerald-400">{toCurrency} {receiveAmount}</span>
-              </div>
+                </div>
               </div>
 
-              <Button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSubmit(e as any);
-                }} 
-                variant="gradient" 
+              <Button
+                onClick={handleSubmit}
+                variant="gradient"
                 className="w-full h-8 text-xs"
+                disabled={!canSubmit || isProcessing}
               >
                 Send Now
               </Button>
