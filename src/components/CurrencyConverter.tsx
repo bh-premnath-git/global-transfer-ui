@@ -12,6 +12,7 @@ import { CURRENCIES, FEE_RATES } from "@/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccount } from "@/hooks/useAccount";
 import { DeliveryMethod, TransferRecipient } from "@/types";
+import AnimatedMap from "./AnimatedMap";
 
 const processingSteps = [
   "Validating transfer details",
@@ -64,6 +65,7 @@ export const CurrencyConverter = () => {
 
   const numSendAmount = parseFloat(sendAmount) || 0;
   const receiveAmount = useMemo(() => (numSendAmount * exchangeRate).toFixed(2), [numSendAmount, exchangeRate]);
+  const receiveAmountValue = useMemo(() => Number(receiveAmount) || 0, [receiveAmount]);
   const fee = useMemo(() => (numSendAmount * FEE_RATES.STANDARD).toFixed(2), [numSendAmount]);
   const totalAmount = useMemo(() => (numSendAmount + parseFloat(fee)).toFixed(2), [numSendAmount, fee]);
 
@@ -203,49 +205,60 @@ export const CurrencyConverter = () => {
   if (isProcessing) {
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-        <div className="bg-card dark:bg-card/90 rounded-2xl p-6 max-w-sm w-full mx-4">
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20">
-              <Shield className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-1">Sending money</h3>
-            <p className="text-sm text-muted-foreground mb-4">Processing securely</p>
-          </div>
-
-          <div className="bg-muted rounded-lg p-3 mb-4 dark:bg-muted/60">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">{fromCurrency} ${sendAmount}</span>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">{toCurrency} {receiveAmount}</span>
-            </div>
-            <div className="text-xs text-muted-foreground text-center mt-1">
-              {recipient.name} • {transferMethods.find(m => m.id === transferMethod)?.label}
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {processingSteps.map((step, index) => (
-              <div key={step} className="flex items-center gap-3">
-                {index < currentStep ? (
-                  <CheckCircle className="h-4 w-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
-                ) : index === currentStep ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
-                ) : (
-                  <div className="h-4 w-4 rounded-full border-2 border-border flex-shrink-0" />
-                )}
-                <span className={`text-sm ${index <= currentStep ? 'text-foreground' : 'text-muted-foreground'}`}>
-                  {step}
-                </span>
+        <div className="bg-card dark:bg-card/90 rounded-2xl p-6 max-w-lg w-full mx-4">
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20">
+                <Shield className="h-6 w-6 text-primary" />
               </div>
-            ))}
-          </div>
+              <h3 className="text-lg font-semibold mb-1">Sending money</h3>
+              <p className="text-sm text-muted-foreground">Processing securely</p>
+            </div>
 
-          <div className="mt-4 flex items-center gap-2 bg-muted rounded-lg p-2 text-xs text-foreground dark:bg-muted/60">
-            <Clock className="h-3 w-3 text-primary" />
-            <span>
-              {transferMethod === "card" ? "Instant" :
-               transferMethod === "cash" ? "30 minutes" : "1-2 days"}
-            </span>
+            <div className="bg-muted rounded-lg p-3 dark:bg-muted/60">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">{fromCurrency} ${sendAmount}</span>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">{toCurrency} {receiveAmount}</span>
+              </div>
+              <div className="text-xs text-muted-foreground text-center mt-1">
+                {recipient.name || 'New recipient'} • {transferMethods.find(m => m.id === transferMethod)?.label}
+              </div>
+            </div>
+
+            <AnimatedMap
+              fromCurrency={fromCurrency}
+              toCurrency={toCurrency}
+              sendAmount={numSendAmount}
+              receiveAmount={receiveAmountValue}
+              isActive={isProcessing}
+              recipientCountry={recipient.country}
+            />
+
+            <div className="space-y-3">
+              {processingSteps.map((step, index) => (
+                <div key={step} className="flex items-center gap-3">
+                  {index < currentStep ? (
+                    <CheckCircle className="h-4 w-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
+                  ) : index === currentStep ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border-2 border-border flex-shrink-0" />
+                  )}
+                  <span className={`text-sm ${index <= currentStep ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {step}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 bg-muted rounded-lg p-2 text-xs text-foreground dark:bg-muted/60">
+              <Clock className="h-3 w-3 text-primary" />
+              <span>
+                {transferMethod === "card" ? "Instant" :
+                 transferMethod === "cash" ? "30 minutes" : "1-2 days"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
