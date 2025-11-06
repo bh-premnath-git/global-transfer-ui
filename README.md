@@ -9,7 +9,7 @@ A modern, full-stack financial transfer application built with React, TypeScript
 - **Server State**: TanStack Query for efficient data fetching, caching, and synchronization
 - **UI Components**: shadcn/ui component library with Tailwind CSS styling
 - **Authentication UX**: Modal-based sign-in and sign-up dialog that can be triggered from anywhere in the app
-- **API Integration**: REST and GraphQL clients with MSW for development mocking
+- **API Integration**: REST and GraphQL clients for real API communication
 - **Theme Support**: Dark/light mode with next-themes
 - **Development Tools**: ESLint, TypeScript, hot module reloading
 
@@ -23,7 +23,6 @@ A modern, full-stack financial transfer application built with React, TypeScript
 | **State Management** | [Redux Toolkit](https://redux-toolkit.js.org/) + [React Redux](https://react-redux.js.org/) |
 | **Server State** | [TanStack Query](https://tanstack.com/query/latest) |
 | **GraphQL** | [Apollo Client](https://www.apollographql.com/docs/react/) |
-| **API Mocking** | [MSW](https://mswjs.io/) |
 | **Styling** | [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) |
 | **Icons** | [Lucide React](https://lucide.dev/) |
 | **Forms** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
@@ -71,9 +70,9 @@ A modern, full-stack financial transfer application built with React, TypeScript
 │   ├── services/           # API services and clients
 │   │   ├── api/
 │   │   │   ├── restClient.ts    # REST API client
-│   │   │   ├── graphqlClient.ts # GraphQL client
-│   │   │   └── mocks/           # MSW mock handlers
+│   │   │   └── graphqlClient.ts # GraphQL client
 │   │   ├── authService.ts
+│   │   ├── wso2AuthService.ts
 │   │   └── transferService.ts
 │   ├── constants/          # Application constants
 │   │   ├── index.ts        # General constants
@@ -113,8 +112,10 @@ A modern, full-stack financial transfer application built with React, TypeScript
    VITE_API_BASE_URL=http://localhost:3001/api
    VITE_GRAPHQL_URL=http://localhost:3001/graphql
    
-   # Mock Service Worker
-   VITE_ENABLE_API_MOCKS=true
+   # WSO2 Authentication (optional)
+   VITE_WSO2_CLIENT_ID=your_client_id
+   VITE_WSO2_CLIENT_SECRET=your_client_secret
+   VITE_USERMANAGEMENTPORT=9444
    ```
 
 3. **Start development server**
@@ -122,7 +123,6 @@ A modern, full-stack financial transfer application built with React, TypeScript
    npm run dev
    ```
    - Opens at `http://localhost:5173` with hot module reloading
-   - MSW mocks are enabled by default for development
    - React Query Devtools available in development mode
 
 4. **Build for production**
@@ -134,8 +134,6 @@ A modern, full-stack financial transfer application built with React, TypeScript
    ```bash
    npm run preview
    ```
-   - To keep payment simulation mocks when previewing, run `VITE_ENABLE_API_MOCKS=true npm run preview`
-   - When serving the production bundle with another tool, set `VITE_ENABLE_API_MOCKS=true` in the environment so MSW continues to power simulated payments
 
 ## 📋 Available Scripts
 
@@ -192,11 +190,6 @@ All components are fully customizable and follow consistent design patterns.
 - Real-time subscriptions support
 - Developer tools integration
 
-### Mock Service Worker (MSW)
-- Seamless API mocking for development
-- Realistic response simulation
-- Network-level request interception
-- Easy toggle between mocked and live APIs
 
 ## 🎨 Theming & Styling
 
@@ -239,8 +232,7 @@ All components are fully customizable and follow consistent design patterns.
 {
   "vite": "^5.4.19",
   "typescript": "^5.8.3",
-  "eslint": "^9.32.0",
-  "msw": "^2.11.3"
+  "eslint": "^9.32.0"
 }
 ```
 
@@ -280,7 +272,9 @@ This application can be deployed to any static hosting service:
 Make sure to configure environment variables in your deployment platform:
 - `VITE_API_BASE_URL`: Your production API URL
 - `VITE_GRAPHQL_URL`: Your GraphQL endpoint
-- `VITE_ENABLE_API_MOCKS`: Set to `false` in production
+- `VITE_WSO2_CLIENT_ID`: WSO2 client ID (if using WSO2 authentication)
+- `VITE_WSO2_CLIENT_SECRET`: WSO2 client secret (if using WSO2 authentication)
+- `VITE_USERMANAGEMENTPORT`: WSO2 user management port
 
 ## 🤝 Development Workflow
 

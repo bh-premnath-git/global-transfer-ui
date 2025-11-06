@@ -23,29 +23,78 @@ export const FEE_RATES = {
   PREMIUM: 0.002,  // 0.2%
 };
 
+// Microservice base URLs
+export const SERVICES = {
+  WSO2: import.meta.env.VITE_WSO2_BASE_URL || 'https://localhost:9444',
+  FOREX: import.meta.env.VITE_FOREX_SERVICE_URL || 'http://localhost:8001',
+  LEDGER: import.meta.env.VITE_LEDGER_SERVICE_URL || 'http://localhost:8002',
+  PAYMENT: import.meta.env.VITE_PAYMENT_SERVICE_URL || 'http://localhost:8003',
+  PROFILE: import.meta.env.VITE_PROFILE_SERVICE_URL || 'http://localhost:8004',
+  RULE_ENGINE: import.meta.env.VITE_RULE_ENGINE_URL || 'http://localhost:8005',
+  WALLET: import.meta.env.VITE_WALLET_SERVICE_URL || 'http://localhost:8006',
+};
+
 export const API_ENDPOINTS = {
+  // WSO2 Identity Server - User Management (SCIM2)
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    LOGOUT: '/auth/logout',
-    ME: '/auth/me',
+    TOKEN: `${SERVICES.WSO2}/oauth2/token`,
+    USERINFO: `${SERVICES.WSO2}/oauth2/userinfo`,
+    REVOKE: `${SERVICES.WSO2}/oauth2/revoke`,
+    SCIM_USERS: `${SERVICES.WSO2}/scim2/Users`,
+    SCIM_USER: (id: string) => `${SERVICES.WSO2}/scim2/Users/${id}`,
   },
+  // Forex Service (Port 8001)
+  FOREX: {
+    HEALTH: `${SERVICES.FOREX}/health`,
+    RATE: (from: string, to: string) => `${SERVICES.FOREX}/rates/${from}/${to}`,
+    UPDATE_RATE: (currencyPair: string) => `${SERVICES.FOREX}/rates/${currencyPair}`,
+  },
+  // Ledger Service (Port 8002)
+  LEDGER: {
+    HEALTH: `${SERVICES.LEDGER}/health`,
+    LIST: `${SERVICES.LEDGER}/ledger`,
+    ENTRY: (id: string) => `${SERVICES.LEDGER}/ledger/${id}`,
+  },
+  // Payment Service (Port 8003)
+  PAYMENT: {
+    HEALTH: `${SERVICES.PAYMENT}/health`,
+    CREATE: `${SERVICES.PAYMENT}/payments`,
+    LIST: `${SERVICES.PAYMENT}/payments`,
+    GET: (id: string) => `${SERVICES.PAYMENT}/payments/${id}`,
+  },
+  // Profile Service (Port 8004)
+  PROFILE: {
+    HEALTH: `${SERVICES.PROFILE}/health`,
+    GET: `${SERVICES.PROFILE}/profile`,
+    UPDATE: `${SERVICES.PROFILE}/profile`,
+  },
+  // Rule Engine Service (Port 8005)
+  RULE_ENGINE: {
+    HEALTH: `${SERVICES.RULE_ENGINE}/health`,
+  },
+  // Wallet Service (Port 8006)
+  WALLET: {
+    HEALTH: `${SERVICES.WALLET}/health`,
+    GET: `${SERVICES.WALLET}/wallet`,
+    BALANCE: `${SERVICES.WALLET}/wallet/balance`,
+  },
+  // Legacy/Compatibility endpoints
   TRANSFERS: {
-    LIST: '/transfers',
-    CREATE: '/transfers',
-    GET: (id: string) => `/transfers/${id}`,
-    RATES: '/transfers/rates',
+    LIST: `${SERVICES.PAYMENT}/payments`,
+    CREATE: `${SERVICES.PAYMENT}/payments`,
+    GET: (id: string) => `${SERVICES.PAYMENT}/payments/${id}`,
+    RATES: (from: string, to: string) => `${SERVICES.FOREX}/rates/${from}/${to}`,
   },
   ACCOUNTS: {
-    WALLET: '/wallet',
-    LEDGER: '/wallet/ledger',
+    WALLET: `${SERVICES.WALLET}/wallet`,
+    LEDGER: `${SERVICES.LEDGER}/ledger`,
   },
   RECIPIENTS: {
-    LIST: '/recipients',
-    CREATE: '/recipients',
-    GET: (id: string) => `/recipients/${id}`,
-    UPDATE: (id: string) => `/recipients/${id}`,
-    DELETE: (id: string) => `/recipients/${id}`,
+    LIST: `${SERVICES.PROFILE}/recipients`,
+    CREATE: `${SERVICES.PROFILE}/recipients`,
+    GET: (id: string) => `${SERVICES.PROFILE}/recipients/${id}`,
+    UPDATE: (id: string) => `${SERVICES.PROFILE}/recipients/${id}`,
+    DELETE: (id: string) => `${SERVICES.PROFILE}/recipients/${id}`,
   },
 };
 

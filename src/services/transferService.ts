@@ -3,8 +3,11 @@ import { graphqlClient } from './api/graphqlClient';
 import { gql } from '@apollo/client';
 import { API_ENDPOINTS, GRAPHQL_OPERATIONS } from '@/constants';
 import { Transfer, TransferRequest, ExchangeRate, Recipient, ApiResponse } from '@/types';
+import { forexService } from './forexService';
+import { paymentService } from './paymentService';
 
 class TransferService {
+  // Using Payment Service (Port 8003)
   async getTransfers(): Promise<ApiResponse<Transfer[]>> {
     return restClient.get(API_ENDPOINTS.TRANSFERS.LIST);
   }
@@ -17,8 +20,9 @@ class TransferService {
     return restClient.get(API_ENDPOINTS.TRANSFERS.GET(id));
   }
 
+  // Using Forex Service (Port 8001)
   async getExchangeRate(from: string, to: string): Promise<ApiResponse<ExchangeRate>> {
-    return restClient.get(`${API_ENDPOINTS.TRANSFERS.RATES}?from=${from}&to=${to}`);
+    return forexService.getRate(from, to);
   }
 
   // GraphQL method for exchange rates
