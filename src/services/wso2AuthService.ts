@@ -26,10 +26,12 @@ class WSO2AuthService {
   constructor() {
     this.clientId = import.meta.env.VITE_WSO2_CLIENT_ID || '';
     this.clientSecret = import.meta.env.VITE_WSO2_CLIENT_SECRET || '';
-    const baseUrl = import.meta.env.VITE_WSO2_BASE_URL || 'https://localhost:9444';
-    this.tokenUrl = import.meta.env.VITE_WSO2_TOKEN_URL || `${baseUrl}/oauth2/token`;
-    this.authUrl = import.meta.env.VITE_WSO2_AUTH_URL || `${baseUrl}/oauth2/authorize`;
-    this.userInfoUrl = import.meta.env.VITE_WSO2_USERINFO_URL || `${baseUrl}/oauth2/userinfo`;
+    
+    // Use Profile Service (port 8004) instead of direct WSO2 (port 9444)
+    const authBaseUrl = import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8004';
+    this.tokenUrl = import.meta.env.VITE_AUTH_TOKEN_URL || `${authBaseUrl}/oauth2/token`;
+    this.authUrl = import.meta.env.VITE_AUTH_LOGIN_URL || `${authBaseUrl}/auth/login`;
+    this.userInfoUrl = import.meta.env.VITE_AUTH_PROFILE_URL || `${authBaseUrl}/auth/profile`;
   }
 
   /**
@@ -55,12 +57,17 @@ class WSO2AuthService {
         body: formData.toString(),
       });
 
+      console.log('📨 WSO2 Response status:', tokenResponse.status, tokenResponse.statusText);
+      
       if (!tokenResponse.ok) {
         const errorData = await tokenResponse.json().catch(() => ({}));
+        console.error('❌ WSO2 Login failed:', tokenResponse.status, errorData);
         throw new Error(errorData.error_description || 'Invalid credentials');
       }
 
       const tokenData: WSO2TokenResponse = await tokenResponse.json();
+      console.log('✅ WSO2 token received successfully');
+      console.log('  Access token (first 20 chars):', tokenData.access_token?.substring(0, 20) + '...');
 
       // Fetch user info using access token
       const user = await this.getUserInfo(tokenData.access_token);
@@ -92,37 +99,27 @@ class WSO2AuthService {
    */
   async register(credentials: RegisterCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
     try {
-      // SCIM2 endpoint for user creation
-      const baseUrl = import.meta.env.VITE_WSO2_BASE_URL || 'https://localhost:9444';
-      const scimUrl = import.meta.env.VITE_WSO2_SCIM_URL 
-        ? `${import.meta.env.VITE_WSO2_SCIM_URL}/Users`
-        : `${baseUrl}/scim2/Users`;
+      // Use Profile Service for registration
+      const baseUrl = import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8004';
+      const registerUrl = `${baseUrl}/auth/register`;
 
-      const scimUser = {
-        schemas: ['urn:ietf:params:scim:schemas:core:2.0:User'],
-        userName: credentials.email,
+      console.log('📝 Registering user via Profile Service:', registerUrl);
+      
+      const registerData = {
+        username: credentials.email,
         password: credentials.password,
-        name: {
-          givenName: credentials.name.split(' ')[0],
-          familyName: credentials.name.split(' ').slice(1).join(' ') || credentials.name,
-        },
-        emails: [
-          {
-            primary: true,
-            value: credentials.email,
-          },
-        ],
+        name: credentials.name,
+        email: credentials.email,
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
       };
 
-      const basicAuth = btoa(`${this.clientId}:${this.clientSecret}`);
-
-      const response = await fetch(scimUrl, {
+      const response = await fetch(registerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${basicAuth}`,
         },
-        body: JSON.stringify(scimUser),
+        body: JSON.stringify(registerData),
       });
 
       if (!response.ok) {
@@ -289,6 +286,7 @@ class WSO2AuthService {
   private clearTokens(): void {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('username');
   }
 
   getToken(): string | null {

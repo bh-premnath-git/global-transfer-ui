@@ -2,6 +2,17 @@
 
 A modern, full-stack financial transfer application built with React, TypeScript, and shadcn/ui components. This starter template provides a robust foundation for building complex web applications with state management, API integration, and comprehensive UI components.
 
+## 🔐 Authentication
+
+This application supports two authentication modes:
+
+- **WSO2 Identity Server** (Production): OAuth2 + SCIM2 integration
+- **Mock Authentication** (Development): Local testing without WSO2
+
+Toggle between modes using `VITE_USE_MOCK_AUTH` in `.env` file.
+
+📖 **Quick Start**: See [LOGIN_FIX_SUMMARY.md](./LOGIN_FIX_SUMMARY.md) for setup instructions.
+
 ## 🚀 Key Features
 
 - **Modern React Architecture**: React 18 with TypeScript for type-safe development
